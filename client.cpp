@@ -17,7 +17,7 @@ int main(int argc, char const **av)
 		printf("\n Socket creation error \n"); 
 		return -1; 
 	} 
-
+	
 	memset(&serv_addr, '0', sizeof(serv_addr)); 
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_port = htons(atoi(av[2]));

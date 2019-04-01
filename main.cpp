@@ -11,6 +11,8 @@
 #include <stdlib.h> 
 #include <netinet/in.h> 
 #include <string.h> 
+#include <sys/types.h>
+#include <sys/wait.h>
 #define PORT 8080
 
 int set_socket(int port)
@@ -32,9 +34,24 @@ int set_socket(int port)
 	return (sok);
 }
 
-int	fork_stuff(int new_sock, int sock)
+int	fork_stuff(int new_sock)
 {
-	
+	pid_t pid = fork();
+	int start;
+	char *hello = (char *)"hellooooo";
+
+	if (pid == 0) {
+		printf("the child:%d\n", new_sock);
+		send(new_sock, hello, strlen(hello), 0);
+		exit (0);
+	} //else if (pid > 0) //	close (new_sock);
+	else if (pid < 0) {
+		return 84;
+	}
+	else if (pid > 0) {
+		waitpid(pid, &start, 0);
+		close(new_sock);
+	}
 	return 0;
 }
 
@@ -43,13 +60,14 @@ int	loop(int sock, int port)
 	struct sockaddr_in adr;
   	int		ads = sizeof(adr);
 	int new_sock;
+
 	printf("INFO : Server started on port %d.\n", port);
-	
-	//for (int i = 0; i == 0; i = 0) {
-	new_sock = accept(sock, (struct sockaddr*)&adr, (socklen_t*)(&ads));
-		//if (new_sock > 0)
-		//	fork_stuff(new_sock, sock);
-	//} 
+	for (int i = 0; i == 0; i = 0) {
+		new_sock = accept(sock, (struct sockaddr*)&adr, (socklen_t*)(&ads));
+		printf("the child loop:%d\n", new_sock);
+		if (new_sock > 0)
+			fork_stuff(new_sock);
+	} 
 	close(sock);
 	return 0;	
 }
