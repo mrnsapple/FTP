@@ -5,16 +5,16 @@
 ## Makefile
 ##
 
-SRC	=	main.cpp	
+SRC	=	main.c	
 
 NAME	=	server
 
-OBJ	=	$(SRC:.cpp=.o)
+OBJ	=	$(SRC:.c=.o)
 
 all	:	$(NAME)
 
 $(NAME)	:	$(OBJ)
-	g++ -o $(NAME) $(SRC) -g -Wall -Wextra 
+	gcc -o $(NAME) $(SRC) -g -Wall -Wextra 
 clean:
 	rm -rf $(OBJ)
 
