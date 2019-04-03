@@ -5,9 +5,10 @@
 ## Makefile
 ##
 
-SRC	=	main.c	
+SRC	=	main.c				\
+		child.c
 
-NAME	=	server
+NAME	=	myftp
 
 OBJ	=	$(SRC:.c=.o)
 

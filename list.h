@@ -27,6 +27,9 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+
+
+
 typedef struct			list
 {
     int sock;
@@ -37,9 +40,15 @@ typedef struct			list
 	int new_sock;
     fd_set active_fd_set;
     fd_set read_fd_set;
+    char ***reply_codes; 
+    int **reply_codes_num;
 
 }   list_t;
 
 int	select_encap(list_t *l);
+list_t	*set_reply_codes(list_t *l);
+int	fork_stuff(list_t *l);
+int set_socket(int port);
+void	child_stuff(list_t *l);
 
 #endif
