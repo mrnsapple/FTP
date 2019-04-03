@@ -7,6 +7,35 @@
 
 #include "list.h"
 
+#define MAXMSG  512
+
+int
+read_from_client (int filedes)
+{
+  char buffer[MAXMSG];
+  int nbytes;
+
+  nbytes = read (filedes, buffer, MAXMSG);
+  if (nbytes < 0)
+    {
+      /* Read error. */
+      perror ("read");
+      exit (EXIT_FAILURE);
+    }
+  else if (nbytes == 0)
+    /* End-of-file. */
+    return -1;
+  else
+    {
+      /* Data read. */
+      fprintf (stderr, "Server: got message: `%s'\n", buffer);
+      return 0;
+    }
+}
+
+
+
+/////////
 int reply_codes_num[] =  {120, 125, 150, 200, 214, 220, 221,226,227,230,250,257,331,333, -1};
 char *reply_codes[] = { 
 	"120 Service ready in nnn minutes.\n",
@@ -45,21 +74,31 @@ int set_socket(int port)
 	return (sok);
 }
 
+void    get_client_request(list_t *l)
+{
+    printf("inget_client\n");
+	
+}
+
 void	child_stuff(list_t *l)	
 {
 	//char *hello = (char *)"220";
-	//int	connection = 1;
-
-	for (int i = 0; reply_codes_num[i] != -1 ; i++) {
+	int	connection = 1;
+    printf("connection:%d, counter:%d\n", connection, l->counter);
+    for (int i = 0; l->counter == 0 && reply_codes_num[i] != -1 ; i++) {
+        l->read_fd_set = l->active_fd_set;
 		if (reply_codes_num[i] == 220)
 			send(l->new_sock, reply_codes[i], strlen(reply_codes[i]), 0);
 	}
+    read_stuff(l);
+    FD_ZERO (&(l->active_fd_set));
+	FD_SET (l->sock, &(l->active_fd_set));
 	//send(l->new_sock, hello, strlen(hello), 0);
-
-	/*while(connection == 1) {
-		FD_ZERO (&(l->active_fd_set));
-		FD_SET (l->sock, &(l->active_fd_set));
+	/*while(connection == 1 && l->counter > 0) {
+        printf("inside\n");
+		
 		connection = select_encap(l);
+        printf("connection:%d\n", connection);
 		if (connection > 0)
 			get_client_request(l);
 		else
@@ -67,9 +106,36 @@ void	child_stuff(list_t *l)
 	}*/
 }
 
-int	fork_stuff(list_t *l)
+int inside_stuff(int i, list_t *l)
 {
-	pid_t pid = fork();
+        printf("begining, count:%d\n", l->counter);
+
+    if (i == l->sock) {
+        l->new_sock = accept(l->sock, (struct sockaddr*)&(l->adr), (socklen_t*)(&(l->ads)));
+        printf("the child loop:%d\n", l->new_sock);
+        if (l->new_sock < 0) {
+            perror ("accept");
+            exit (84);
+        }
+        child_stuff(l);
+       // fprintf (stderr, "Server: connect from host %s, port %hd.\n",
+        //             (l->adr.sin_addr),
+         //           ntohs (l->adr.sin_port));
+        FD_SET (l->new_sock, &l->active_fd_set);
+    }
+    else {
+        /* Data arriving on an already-connected socket. */
+        if (read_from_client (i) < 0) {
+            close (i);
+            FD_CLR (i, &l->active_fd_set);
+            }
+    }
+    printf("begining, count:%d\n", l->counter);
+	
+    return (0);
+}
+
+	/*pid_t pid = fork();
 	int start;
 
 	if (pid == 0) {
@@ -83,6 +149,4 @@ int	fork_stuff(list_t *l)
 	else if (pid > 0) {
 		waitpid(pid, &start, 0);
 		close(l->new_sock);
-	}
-	return 0;
-}
+	}*/

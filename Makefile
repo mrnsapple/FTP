@@ -6,7 +6,8 @@
 ##
 
 SRC	=	main.c				\
-		child.c
+		child.c				\
+		read.c
 
 NAME	=	myftp
 

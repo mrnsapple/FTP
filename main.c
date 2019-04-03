@@ -10,20 +10,22 @@
 int	select_encap(list_t *l)
 {
 	l->read_fd_set = l->active_fd_set;
-
-	return (select (l->new_sock, &(l->read_fd_set), NULL, NULL, NULL) < 0);
+	return (select (FD_SETSIZE, &(l->read_fd_set), NULL, NULL, NULL));
 }
 
 int	loop(list_t *l)
 {
 	l->ads = sizeof(l->adr);
 	printf("INFO : Server started on port %d.\n", l->port);
+	FD_ZERO (&(l->active_fd_set));
+	FD_SET (l->sock, &(l->active_fd_set));
+	for (l->counter = 0; l->counter >= 0; l->counter++) {
+		select_encap(l);
+		printf("afeter_beforeselect\n");
 
-	for (int i = 0; i == 0; i = 0) {
-		l->new_sock = accept(l->sock, (struct sockaddr*)&(l->adr), (socklen_t*)(&(l->ads)));
-		printf("the child loop:%d\n", l->new_sock);
-		if (l->new_sock > 0)
-			fork_stuff(l);
+		for (int i = 0; i < FD_SETSIZE; ++i)
+		 	if (FD_ISSET (i, &(l->read_fd_set)))
+          		inside_stuff(i, l);
 	} 
 	close(l->sock);
 	return 0;	
