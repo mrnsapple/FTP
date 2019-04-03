@@ -85,14 +85,14 @@ void	child_stuff(list_t *l)
 	//char *hello = (char *)"220";
 	int	connection = 1;
     printf("connection:%d, counter:%d\n", connection, l->counter);
-    for (int i = 0; l->counter == 0 && reply_codes_num[i] != -1 ; i++) {
+    for (int i = 0; reply_codes_num[i] != -1 ; i++) {
         l->read_fd_set = l->active_fd_set;
-		if (reply_codes_num[i] == 220)
+		if ((l->counter == 0 && reply_codes_num[i] == 220) || (l->counter == 1 && reply_codes_num[i] == 331))
 			send(l->new_sock, reply_codes[i], strlen(reply_codes[i]), 0);
 	}
     read_stuff(l);
-    FD_ZERO (&(l->active_fd_set));
-	FD_SET (l->sock, &(l->active_fd_set));
+    //FD_ZERO (&(l->active_fd_set));
+	//FD_SET (l->sock, &(l->active_fd_set));
 	//send(l->new_sock, hello, strlen(hello), 0);
 	/*while(connection == 1 && l->counter > 0) {
         printf("inside\n");
@@ -108,8 +108,7 @@ void	child_stuff(list_t *l)
 
 int inside_stuff(int i, list_t *l)
 {
-        printf("begining, count:%d\n", l->counter);
-
+    printf("begining, count:%d\n", l->counter);
     if (i == l->sock) {
         l->new_sock = accept(l->sock, (struct sockaddr*)&(l->adr), (socklen_t*)(&(l->ads)));
         printf("the child loop:%d\n", l->new_sock);
@@ -129,9 +128,7 @@ int inside_stuff(int i, list_t *l)
             close (i);
             FD_CLR (i, &l->active_fd_set);
             }
-    }
-    printf("begining, count:%d\n", l->counter);
-	
+    }	
     return (0);
 }
 
