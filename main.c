@@ -29,11 +29,21 @@ int	loop(list_t *l)
 	return 0;	
 }
 
+int	print_help()
+{
+	printf("USAGE: ./myftp port path\n");
+	printf("\tport is the port number on which the server socket listens\n");
+	printf("\tpath is the path to the home directory for the Anonymous user\n");
+	return (0);
+}
+
 int main(int ac, char **av)
 {
 	list_t *l = malloc(sizeof(list_t));
 
 	if (ac == 2 && av != NULL && l != NULL) {
+		if (strcmp("-help", av[1]) == 0)
+			return (print_help());
 		l->port = atoi(av[1]);
 		l->sock = set_socket(l->port);
 		return (loop(l));
