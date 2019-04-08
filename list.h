@@ -70,5 +70,6 @@ void    try_options(list_t *l);
 int    len_array(char **av);
 char **my_str_to_wordtab(char *str, char x);
 void	send_specific_code(list_t *l, int specific_code);
+void	fork_stuff(int i, list_t *l);
 
 #endif

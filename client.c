@@ -24,16 +24,21 @@ int main(int argc, char const **av)
 	serv_addr.sin_port = htons(atoi(av[2]));
 	serv_addr.sin_addr.s_addr = inet_addr(av[1]);
 	
-	// Convert IPv4 and IPv6 addresses from text to binary form 
 	
 	if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) 
 	{ 
 		printf("\nConnection Failed \n"); 
 		return -1; 
 	} 
-	//send(sock , hello , strlen(hello) , 0 ); 
-	printf("Hello message sent\n"); 
-	valread = read( sock , buffer, 1024); 
-	printf("%s\n",buffer ); 
+	char *sender[] = {"USER ANONUMOUS", "PASS PASWORD", NULL};
+	//while(1) {
+	for (int i = 0; sender[i] != NULL; i++) {
+		send(sock , sender[i], strlen(sender[i]) , 0 ); 
+		printf("Hello message sent\n"); 
+		valread = read( sock , buffer, 1024); 
+		printf("%s\n",buffer ); 
+	
+	}
+	//}
 	return 0; 
 } 

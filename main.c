@@ -19,12 +19,13 @@ int	loop(list_t *l)
 	printf("INFO : Server started on port %d.\n", l->port);
 	FD_ZERO (&(l->active_fd_set));
 	FD_SET (l->sock, &(l->active_fd_set));
-	for (l->counter = 0; l->counter >= 0; l->counter++) {
+	while(1) {
 		select_encap(l);
 		for (int i = 0; i < FD_SETSIZE; ++i)
 		 	if (FD_ISSET (i, &(l->read_fd_set)))
-          		inside_stuff(i, l);
+				fork_stuff(i, l);
 	} 
+	printf("outside_loop\n");
 	close(l->sock);
 	return 0;	
 }

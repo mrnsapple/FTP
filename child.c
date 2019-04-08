@@ -62,18 +62,41 @@ void	set_socket(list_t *l)
 
 void	send_specific_code(list_t *l, int specific_code)
 {
+	printf("sending code:%d\n", specific_code);
   for (int i = 0; reply_codes_num[i] != -1 ; i++)
 		if (reply_codes_num[i] == specific_code)
-			send(l->new_sock, reply_codes[i], strlen(reply_codes[i]), 0);
+			write(l->new_sock, reply_codes[i], strlen(reply_codes[i]));
+	//send(l->new_sock, reply_codes[i], strlen(reply_codes[i]), 0);
 }
 
 void	child_stuff(list_t *l)	
 {
+		
 		send_specific_code(l, 220);
-		for (int loop = 0; loop >= 0; loop++) {
+		for (l->counter = 0; l->counter >= 0; l->counter++) {
 			read_stuff(l);
 			try_options(l);
 		}
+}
+
+void	fork_stuff(int i, list_t *l)
+{
+	pid_t child_pid;
+	int	status = 0;
+	int	waitoptions = 0;
+
+	printf("\nNEW CLIENT\n");
+	child_pid = fork();
+	if (child_pid == -1) {
+		perror("error fork\n");
+		exit(84);
+	}
+	if (child_pid == 0)
+		inside_stuff(i, l);
+	if (child_pid > 0)
+		child_pid = waitpid(child_pid, &status, waitoptions);
+	
+
 }
 
 int inside_stuff(int i, list_t *l)
@@ -84,12 +107,13 @@ int inside_stuff(int i, list_t *l)
             perror ("accept");
             exit (84);
         }
-        child_stuff(l);
+				child_stuff(l);
         FD_SET (l->new_sock, &l->active_fd_set);
     }
 		else if (read_from_client (i) < 0) {
 				close (i);
 				FD_CLR (i, &l->read_fd_set);
 		}
-    return (0);
+    exit (0);
+		return (0);
 }

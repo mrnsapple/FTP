@@ -127,9 +127,9 @@ void    set_options(list_t *l)
 
 void    try_options(list_t *l)
 {
-    //for(int i =0 ; l->buff_array[i] != NULL; i++) {
-    //    printf("s:%s\n", l->buff_array[i]);
-    //}
+    for(int i =0 ; l->buff_array[i] != NULL; i++) {
+        printf("s:%s\n", l->buff_array[i]);
+    }
     for (int i = 0; l->options[i] != NULL; i++) {
         (l->options[i])(l);
     }
