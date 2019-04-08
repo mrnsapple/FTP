@@ -39,11 +39,10 @@ int read_from_client (int filedes)
     }
   else if (nbytes == 0)
     return -1;
-  else
-    {
+  else {
       fprintf (stderr, "Server: got message: `%s'\n", buffer);
       return 0;
-    }
+  }
 }
 
 void	set_socket(list_t *l)
@@ -73,25 +72,14 @@ void	child_stuff(list_t *l)
 		send_specific_code(l, 220);
 		for (int loop = 0; loop >= 0; loop++) {
 			read_stuff(l);
-			printf("result:%s\n", l->buff);
 			try_options(l);
 		}
 }
-  //FD_ZERO (&(l->active_fd_set));
-	//FD_SET (l->sock, &(l->active_fd_set));
-	/*while(connection == 1 && l->counter > 0) {
-        printf("inside\n");
-		
-		connection = select_encap(l);
-        printf("connection:%d\n", connection);
-		
-	}*/
+
 int inside_stuff(int i, list_t *l)
 {
-    printf("In Inside_stuff:%d\n", l->counter);
     if (i == l->sock) {
         l->new_sock = accept(l->sock, (struct sockaddr*)&(l->adr), (socklen_t*)(&(l->ads)));
-        printf("the child loop:%d\n", l->new_sock);
         if (l->new_sock < 0) {
             perror ("accept");
             exit (84);
@@ -99,29 +87,9 @@ int inside_stuff(int i, list_t *l)
         child_stuff(l);
         FD_SET (l->new_sock, &l->active_fd_set);
     }
-		else {
-			/* Data arriving on an already-connected socket. */
-			if (read_from_client (i) < 0) {
-					printf("closing i\n");
-					close (i);
-					FD_CLR (i, &l->read_fd_set);
-				}
-    }
+		else if (read_from_client (i) < 0) {
+				close (i);
+				FD_CLR (i, &l->read_fd_set);
+		}
     return (0);
 }
-
-	/*pid_t pid = fork();
-	int start;
-
-	if (pid == 0) {
-		printf("the child:%d\n", l->new_sock);
-		child_stuff(l);
-		exit (0);
-	} //else if (pid > 0) //	close (new_sock);
-	else if (pid < 0) {
-		return 84;
-	}
-	else if (pid > 0) {
-		waitpid(pid, &start, 0);
-		close(l->new_sock);
-	}*/

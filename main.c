@@ -21,8 +21,6 @@ int	loop(list_t *l)
 	FD_SET (l->sock, &(l->active_fd_set));
 	for (l->counter = 0; l->counter >= 0; l->counter++) {
 		select_encap(l);
-		printf("afeter_beforeselect%d\n", FD_SETSIZE);
-
 		for (int i = 0; i < FD_SETSIZE; ++i)
 		 	if (FD_ISSET (i, &(l->read_fd_set)))
           		inside_stuff(i, l);

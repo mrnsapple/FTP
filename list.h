@@ -34,7 +34,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-#define LEN_OPTIONS 12
+#define LEN_OPTIONS 15
 
 
 typedef struct			list

@@ -22,23 +22,115 @@ void    password_authentification(list_t *l)
 
 }
 
+void    cwd(list_t *l)
+{
+    if (l->buff_array_size == 2 &&
+        strcmp("CWD", l->buff_array[0]) == 0)
+        send_specific_code(l, 250);
+}
+
+void    cdup(list_t *l)
+{
+    if (l->buff_array_size == 2 &&
+        strcmp("CDUP", l->buff_array[0]) == 0)
+        send_specific_code(l, 200);
+}
+
+void    quit(list_t *l)
+{
+    if (l->buff_array_size == 2 &&
+        strcmp("QUIT", l->buff_array[0]) == 0)
+        send_specific_code(l, 221);
+}
+
+void    delete(list_t *l)
+{
+    if (l->buff_array_size == 2 &&
+        strcmp("DELETE", l->buff_array[0]) == 0)
+        send_specific_code(l, 250);
+}
+
+void    pwd(list_t *l)
+{
+    if (l->buff_array_size == 2 &&
+        strcmp("PWD", l->buff_array[0]) == 0)
+        send_specific_code(l, 257);
+}
+
+void    pasv(list_t *l)
+{
+    if (l->buff_array_size == 2 &&
+        strcmp("PASV", l->buff_array[0]) == 0)
+        send_specific_code(l, 227);
+}
+
+void    port(list_t *l)
+{
+    if (l->buff_array_size == 2 &&
+        strcmp("PORT", l->buff_array[0]) == 0)
+        send_specific_code(l, 200);
+}
+
+void    help(list_t *l)
+{
+    if (l->buff_array_size == 2 &&
+        strcmp("HELP", l->buff_array[0]) == 0)
+        send_specific_code(l, 214);
+}
+
+void    noop(list_t *l)
+{
+    if (l->buff_array_size == 2 &&
+        strcmp("NOOP", l->buff_array[0]) == 0)
+        send_specific_code(l, 200);
+}
+
+void    retr(list_t *l)
+{
+    if (l->buff_array_size == 2 &&
+        strcmp("RETR", l->buff_array[0]) == 0)
+        send_specific_code(l, 150);
+}
+
+void    stor(list_t *l)
+{
+    if (l->buff_array_size == 2 &&
+        strcmp("STOR", l->buff_array[0]) == 0)
+        send_specific_code(l, 150);
+}
+
+void    list(list_t *l)
+{
+    if (l->buff_array_size == 2 &&
+        strcmp("LIST", l->buff_array[0]) == 0)
+        send_specific_code(l, 150);
+}
+
 void    set_options(list_t *l)
 {
     l->options[0] = &user_authentification;
     l->options[1] = &password_authentification;
-    l->options[2] = NULL;
-
+    l->options[2] = &cwd;
+    l->options[3] = &cdup;
+    l->options[4] = &quit;
+    l->options[5] = &delete;
+    l->options[6] = &pwd;
+    l->options[7] = &pasv;
+    l->options[8] = &port;
+    l->options[9] = &help;
+    l->options[10] = &noop;
+    l->options[11] = &retr;
+    l->options[12] = &stor;
+    l->options[12] = &list;
+    l->options[13] = NULL;
 }
 
 void    try_options(list_t *l)
 {
-    for(int i =0 ; l->buff_array[i] != NULL; i++) {
-        printf("s:%s\n", l->buff_array[i]);
-    }
+    //for(int i =0 ; l->buff_array[i] != NULL; i++) {
+    //    printf("s:%s\n", l->buff_array[i]);
+    //}
     for (int i = 0; l->options[i] != NULL; i++) {
         (l->options[i])(l);
     }
 }
-//if ((l->counter == 0 && reply_codes_num[i] == 220) || (l->counter == 1 && reply_codes_num[i] == 331))
-//	send(l->new_sock, reply_codes[i], strlen(reply_codes[i]), 0);
-			
