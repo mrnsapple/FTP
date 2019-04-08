@@ -34,7 +34,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-
+#define LEN_OPTIONS 12
 
 
 typedef struct			list
@@ -47,17 +47,28 @@ typedef struct			list
 	int new_sock;
     fd_set active_fd_set;
     fd_set read_fd_set;
+    struct sockaddr_in addr;
+    int counter;
+
     //char ***reply_codes; 
     //int **reply_codes_num;
+
     char buff[2000];
-    int counter;
+    char **buff_array;
+    int buff_array_size;
+    void (*options[LEN_OPTIONS])(struct list*);
 }   list_t;
 
 int	select_encap(list_t *l);
 list_t	*set_reply_codes(list_t *l);
 int	inside_stuff(int i, list_t *l);
-int set_socket(int port);
+void	set_socket(list_t *l);
 void	child_stuff(list_t *l);
 int        read_stuff(list_t *l);
+void    set_options(list_t *l);
+void    try_options(list_t *l);
+int    len_array(char **av);
+char **my_str_to_wordtab(char *str, char x);
+void	send_specific_code(list_t *l, int specific_code);
 
 #endif

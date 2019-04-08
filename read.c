@@ -11,17 +11,12 @@ int        read_stuff(list_t *l)
 {
     int result;
 
+    bzero(l->buff, 2000);
     result = read(l->new_sock, l->buff, 2000);
-    printf("result:%d\n", result);
-
     if (result <= 0)
-        return -1;
-    if (result <= 0) {
-      return (-1);
-    }
-    printf("result:%s\n", l->buff);
+        exit (84);
+    l->buff[result] = '\0';
+    l->buff_array = my_str_to_wordtab(l->buff, ' ');
+    l->buff_array_size = len_array(l->buff_array);
     return (0);
-    //for (i = 0; i < r; i++)
-    //    if (ct->buffer[i] == '\n' || clt->buffer[i] == '\r')
-    //    clt->buffer[i] = '\0';
 }

@@ -7,7 +7,9 @@
 
 SRC	=	main.c				\
 		child.c				\
-		read.c
+		read.c				\
+		send.c				\
+		my_str_to_word_tab.c
 
 NAME	=	myftp
 
@@ -23,4 +25,4 @@ clean:
 re	:	fclean all
 
 fclean	: clean
-	rm -rf $(NAME) *.o *~ *.gcda *.gcno *# 
+	rm -rf $(NAME) *.o *~ *.gcda *.gcno *# .vscode

@@ -50,7 +50,7 @@ launch_client()
   $MKFIFO $PIPE
   ($TAIL -f $PIPE 2>/dev/null | $NC $host $port &> $OUT &) >/dev/null 2>/dev/null
 
-  echo "Connecting to $host : $port"
+  echo "Connecting to $host : $port : $PIPE"
   sleep $TIMEOUT
   getcode 220
   if [[ $? -eq 1 ]]; then

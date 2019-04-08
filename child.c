@@ -6,36 +6,8 @@
 */
 
 #include "list.h"
-
 #define MAXMSG  512
 
-int
-read_from_client (int filedes)
-{
-  char buffer[MAXMSG];
-  int nbytes;
-
-  nbytes = read (filedes, buffer, MAXMSG);
-  if (nbytes < 0)
-    {
-      /* Read error. */
-      perror ("read");
-      exit (EXIT_FAILURE);
-    }
-  else if (nbytes == 0)
-    /* End-of-file. */
-    return -1;
-  else
-    {
-      /* Data read. */
-      fprintf (stderr, "Server: got message: `%s'\n", buffer);
-      return 0;
-    }
-}
-
-
-
-/////////
 int reply_codes_num[] =  {120, 125, 150, 200, 214, 220, 221,226,227,230,250,257,331,333, -1};
 char *reply_codes[] = { 
 	"120 Service ready in nnn minutes.\n",
@@ -55,60 +27,68 @@ char *reply_codes[] = {
 	NULL
 };
 
-int set_socket(int port)
+int read_from_client (int filedes)
 {
-	int		sok;
-  	struct sockaddr_in addr;
+  char buffer[MAXMSG];
+  int nbytes;
 
-	if ((sok = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+  nbytes = read (filedes, buffer, MAXMSG);
+  if (nbytes < 0) {
+      perror ("read");
+      exit (EXIT_FAILURE);
+    }
+  else if (nbytes == 0)
+    return -1;
+  else
+    {
+      fprintf (stderr, "Server: got message: `%s'\n", buffer);
+      return 0;
+    }
+}
+
+void	set_socket(list_t *l)
+{
+	if ((l->sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
 		perror("setsockopt"); 
 		exit(EXIT_FAILURE);   
 	}
-	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = INADDR_ANY;
-	addr.sin_port = htons(port);
-	if (bind(sok, (struct sockaddr *)&addr, sizeof(addr)) == -1)
+	l->addr.sin_family = AF_INET;
+	l->addr.sin_addr.s_addr = INADDR_ANY;
+	l->addr.sin_port = htons(l->port);
+	if (bind(l->sock, (struct sockaddr *)&(l->addr), sizeof(l->addr)) == -1)
 		perror("setsockopt"); 
-	if (listen(sok, 5) == -1)
+	if (listen(l->sock, 5) == -1)
 		perror("setsockopt"); 
-	return (sok);
 }
 
-void    get_client_request(list_t *l)
+void	send_specific_code(list_t *l, int specific_code)
 {
-    printf("inget_client\n");
-	
+  for (int i = 0; reply_codes_num[i] != -1 ; i++)
+		if (reply_codes_num[i] == specific_code)
+			send(l->new_sock, reply_codes[i], strlen(reply_codes[i]), 0);
 }
 
 void	child_stuff(list_t *l)	
 {
-	//char *hello = (char *)"220";
-	int	connection = 1;
-    printf("connection:%d, counter:%d\n", connection, l->counter);
-    for (int i = 0; reply_codes_num[i] != -1 ; i++) {
-        l->read_fd_set = l->active_fd_set;
-		if ((l->counter == 0 && reply_codes_num[i] == 220) || (l->counter == 1 && reply_codes_num[i] == 331))
-			send(l->new_sock, reply_codes[i], strlen(reply_codes[i]), 0);
-	}
-    read_stuff(l);
-    //FD_ZERO (&(l->active_fd_set));
+		send_specific_code(l, 220);
+		for (int loop = 0; loop >= 0; loop++) {
+			read_stuff(l);
+			printf("result:%s\n", l->buff);
+			try_options(l);
+		}
+}
+  //FD_ZERO (&(l->active_fd_set));
 	//FD_SET (l->sock, &(l->active_fd_set));
-	//send(l->new_sock, hello, strlen(hello), 0);
 	/*while(connection == 1 && l->counter > 0) {
         printf("inside\n");
 		
 		connection = select_encap(l);
         printf("connection:%d\n", connection);
-		if (connection > 0)
-			get_client_request(l);
-		else
-			connection = 0;		
+		
 	}*/
-}
-
 int inside_stuff(int i, list_t *l)
 {
-    printf("begining, count:%d\n", l->counter);
+    printf("In Inside_stuff:%d\n", l->counter);
     if (i == l->sock) {
         l->new_sock = accept(l->sock, (struct sockaddr*)&(l->adr), (socklen_t*)(&(l->ads)));
         printf("the child loop:%d\n", l->new_sock);
@@ -117,18 +97,16 @@ int inside_stuff(int i, list_t *l)
             exit (84);
         }
         child_stuff(l);
-       // fprintf (stderr, "Server: connect from host %s, port %hd.\n",
-        //             (l->adr.sin_addr),
-         //           ntohs (l->adr.sin_port));
         FD_SET (l->new_sock, &l->active_fd_set);
     }
-    else {
-        /* Data arriving on an already-connected socket. */
-        if (read_from_client (i) < 0) {
-            close (i);
-            FD_CLR (i, &l->active_fd_set);
-            }
-    }	
+		else {
+			/* Data arriving on an already-connected socket. */
+			if (read_from_client (i) < 0) {
+					printf("closing i\n");
+					close (i);
+					FD_CLR (i, &l->read_fd_set);
+				}
+    }
     return (0);
 }
 
