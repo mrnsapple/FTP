@@ -48,16 +48,20 @@ int read_from_client (int filedes)
 void	set_socket(list_t *l)
 {
 	if ((l->sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+		//close();
 		perror("setsockopt"); 
 		exit(EXIT_FAILURE);   
 	}
 	l->addr.sin_family = AF_INET;
 	l->addr.sin_addr.s_addr = INADDR_ANY;
 	l->addr.sin_port = htons(l->port);
-	if (bind(l->sock, (struct sockaddr *)&(l->addr), sizeof(l->addr)) == -1)
-		perror("setsockopt"); 
-	if (listen(l->sock, 5) == -1)
-		perror("setsockopt"); 
+	if (bind(l->sock, (struct sockaddr *)&(l->addr), sizeof(l->addr)) == -1) {
+		//close(l->port);
+		//set_socket(l);
+		perror("setsockopt_bind"); 
+	}
+	if (listen(l->sock, MAX_CLIENTS) == -1)
+		perror("setsockopt_listen"); 
 }
 
 void	send_specific_code(list_t *l, int specific_code)
@@ -65,7 +69,7 @@ void	send_specific_code(list_t *l, int specific_code)
 	printf("sending code:%d\n", specific_code);
   for (int i = 0; reply_codes_num[i] != -1 ; i++)
 		if (reply_codes_num[i] == specific_code)
-			write(l->new_sock, reply_codes[i], strlen(reply_codes[i]));
+			write(l->current_socket, reply_codes[i], strlen(reply_codes[i]));
 	//send(l->new_sock, reply_codes[i], strlen(reply_codes[i]), 0);
 }
 
@@ -79,11 +83,53 @@ void	child_stuff(list_t *l)
 		}
 }
 
+int accept_client(int i, list_t *l)
+{
+    if (i == l->sock) {
+				printf("beforeaccept");
+        l->current_socket = accept(l->sock, (struct sockaddr*)&(l->adr), (socklen_t*)(&(l->ads)));
+        if (l->current_socket < 0) {
+            perror ("accept");
+            return (84);
+        }
+				add_new_socket(l, l->current_socket);
+				send_specific_code(l, 220);
+				//child_stuff(l);
+    }
+		//else if (read_from_client (i) < 0) {
+		//			close (i);
+		//			FD_CLR (i, &l->read_fd_set);
+		//	}
+    //exit (0);
+		return (0);
+}
+
+int interact_with_client(int i, list_t *l)
+{
+		int sd;
+
+		printf("\nafterinteract\n");
+		for (i = 0; i < MAX_CLIENTS; i++) {
+			//if (l->client_socket[i] != 0)
+			//		printf("client is not socket\n");
+			sd = l->client_socket[i];
+			if (FD_ISSET(sd , &l->read_fd_set)) {
+				printf("client is not socket\n");
+			
+				l->current_socket = l->client_socket[i];
+				if (read_stuff(l) > 0)
+					try_options(l);
+			}
+		}
+		return (0);
+}
+
+/*
 void	fork_stuff(int i, list_t *l)
 {
 	pid_t child_pid;
-	int	status = 0;
-	int	waitoptions = 0;
+	//int	status = 0;
+	//int	waitoptions = 0;
 
 	printf("\nNEW CLIENT\n");
 	child_pid = fork();
@@ -93,27 +139,6 @@ void	fork_stuff(int i, list_t *l)
 	}
 	if (child_pid == 0)
 		inside_stuff(i, l);
-	if (child_pid > 0)
-		child_pid = waitpid(child_pid, &status, waitoptions);
-	
-
-}
-
-int inside_stuff(int i, list_t *l)
-{
-    if (i == l->sock) {
-        l->new_sock = accept(l->sock, (struct sockaddr*)&(l->adr), (socklen_t*)(&(l->ads)));
-        if (l->new_sock < 0) {
-            perror ("accept");
-            exit (84);
-        }
-				child_stuff(l);
-        FD_SET (l->new_sock, &l->active_fd_set);
-    }
-		else if (read_from_client (i) < 0) {
-				close (i);
-				FD_CLR (i, &l->read_fd_set);
-		}
-    exit (0);
-		return (0);
-}
+	//if (child_pid > 0)
+	//	child_pid = waitpid(child_pid, &status, waitoptions);
+}*/

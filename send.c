@@ -9,100 +9,100 @@
 
 void    user_authentification(list_t *l)
 {
-    if (l->buff_array_size == 2 &&
-        strcmp("USER", l->buff_array[0]) == 0)
+    if (l->read->buff_array_size == 2 &&
+        strcmp("USER", l->read->buff_array[0]) == 0)
         send_specific_code(l, 331);
 }
 
 void    password_authentification(list_t *l)
 {
-    if (l->buff_array_size == 2 &&
-        strcmp("PASS", l->buff_array[0]) == 0)
+    if (l->read->buff_array_size == 2 &&
+        strcmp("PASS", l->read->buff_array[0]) == 0)
         send_specific_code(l, 230);
 
 }
 
 void    cwd(list_t *l)
 {
-    if (l->buff_array_size == 2 &&
-        strcmp("CWD", l->buff_array[0]) == 0)
+    if (l->read->buff_array_size == 2 &&
+        strcmp("CWD", l->read->buff_array[0]) == 0)
         send_specific_code(l, 250);
 }
 
 void    cdup(list_t *l)
 {
-    if (l->buff_array_size == 2 &&
-        strcmp("CDUP", l->buff_array[0]) == 0)
+    if (l->read->buff_array_size == 2 &&
+        strcmp("CDUP", l->read->buff_array[0]) == 0)
         send_specific_code(l, 200);
 }
 
 void    quit(list_t *l)
 {
-    if (l->buff_array_size == 2 &&
-        strcmp("QUIT", l->buff_array[0]) == 0)
+    if (l->read->buff_array_size == 2 &&
+        strcmp("QUIT", l->read->buff_array[0]) == 0)
         send_specific_code(l, 221);
 }
 
 void    delete(list_t *l)
 {
-    if (l->buff_array_size == 2 &&
-        strcmp("DELETE", l->buff_array[0]) == 0)
+    if (l->read->buff_array_size == 2 &&
+        strcmp("DELETE", l->read->buff_array[0]) == 0)
         send_specific_code(l, 250);
 }
 
 void    pwd(list_t *l)
 {
-    if (l->buff_array_size == 2 &&
-        strcmp("PWD", l->buff_array[0]) == 0)
+    if (l->read->buff_array_size == 2 &&
+        strcmp("PWD", l->read->buff_array[0]) == 0)
         send_specific_code(l, 257);
 }
 
 void    pasv(list_t *l)
 {
-    if (l->buff_array_size == 2 &&
-        strcmp("PASV", l->buff_array[0]) == 0)
+    if (l->read->buff_array_size == 2 &&
+        strcmp("PASV", l->read->buff_array[0]) == 0)
         send_specific_code(l, 227);
 }
 
 void    port(list_t *l)
 {
-    if (l->buff_array_size == 2 &&
-        strcmp("PORT", l->buff_array[0]) == 0)
+    if (l->read->buff_array_size == 2 &&
+        strcmp("PORT", l->read->buff_array[0]) == 0)
         send_specific_code(l, 200);
 }
 
 void    help(list_t *l)
 {
-    if (l->buff_array_size == 2 &&
-        strcmp("HELP", l->buff_array[0]) == 0)
+    if (l->read->buff_array_size == 2 &&
+        strcmp("HELP", l->read->buff_array[0]) == 0)
         send_specific_code(l, 214);
 }
 
 void    noop(list_t *l)
 {
-    if (l->buff_array_size == 2 &&
-        strcmp("NOOP", l->buff_array[0]) == 0)
+    if (l->read->buff_array_size == 2 &&
+        strcmp("NOOP", l->read->buff_array[0]) == 0)
         send_specific_code(l, 200);
 }
 
 void    retr(list_t *l)
 {
-    if (l->buff_array_size == 2 &&
-        strcmp("RETR", l->buff_array[0]) == 0)
+    if (l->read->buff_array_size == 2 &&
+        strcmp("RETR", l->read->buff_array[0]) == 0)
         send_specific_code(l, 150);
 }
 
 void    stor(list_t *l)
 {
-    if (l->buff_array_size == 2 &&
-        strcmp("STOR", l->buff_array[0]) == 0)
+    if (l->read->buff_array_size == 2 &&
+        strcmp("STOR", l->read->buff_array[0]) == 0)
         send_specific_code(l, 150);
 }
 
 void    list(list_t *l)
 {
-    if (l->buff_array_size == 2 &&
-        strcmp("LIST", l->buff_array[0]) == 0)
+    if (l->read->buff_array_size == 2 &&
+        strcmp("LIST", l->read->buff_array[0]) == 0)
         send_specific_code(l, 150);
 }
 
@@ -127,8 +127,8 @@ void    set_options(list_t *l)
 
 void    try_options(list_t *l)
 {
-    for(int i =0 ; l->buff_array[i] != NULL; i++) {
-        printf("s:%s\n", l->buff_array[i]);
+    for(int i =0 ; l->read->buff_array[i] != NULL; i++) {
+        printf("s:%s\n", l->read->buff_array[i]);
     }
     for (int i = 0; l->options[i] != NULL; i++) {
         (l->options[i])(l);

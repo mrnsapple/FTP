@@ -9,21 +9,24 @@
 
 int	select_encap(list_t *l)
 {
-	l->read_fd_set = l->active_fd_set;
 	return (select (FD_SETSIZE, &(l->read_fd_set), NULL, NULL, NULL));
 }
 
 int	loop(list_t *l)
 {
-	l->ads = sizeof(l->adr);
+	l->ads = sizeof(struct sockaddr_in);
 	printf("INFO : Server started on port %d.\n", l->port);
-	FD_ZERO (&(l->active_fd_set));
-	FD_SET (l->sock, &(l->active_fd_set));
 	while(1) {
+		FD_ZERO (&(l->read_fd_set));
+		FD_SET (l->sock, &(l->read_fd_set));
+		add_client_to_sockket(l);
 		select_encap(l);
 		for (int i = 0; i < FD_SETSIZE; ++i)
-		 	if (FD_ISSET (i, &(l->read_fd_set)))
-				fork_stuff(i, l);
+		 	if (FD_ISSET (i, &(l->read_fd_set))) {
+			 	accept_client(i, l);
+				interact_with_client(i, l);
+			}
+		//fork_stuff(i, l);
 	} 
 	printf("outside_loop\n");
 	close(l->sock);
@@ -41,13 +44,15 @@ int	print_help()
 int main(int ac, char **av)
 {
 	list_t *l = malloc(sizeof(list_t));
+	l->read = malloc(sizeof(read_t));
 
-	if (ac == 2 && av != NULL && l != NULL) {
+	if (ac == 2 && av != NULL && l != NULL && l->read != NULL) {
 		if (strcmp("-help", av[1]) == 0)
 			return (print_help());
 		l->port = atoi(av[1]);
 		set_socket(l);
 		set_options(l);
+		initialize_clients(l);
 		return (loop(l));
 	}
 	return 84;
