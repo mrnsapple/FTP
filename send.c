@@ -19,7 +19,7 @@ void    password_authentification(list_t *l)
     if (l->read->buff_array_size == 2 &&
         strcmp("PASS", l->read->buff_array[0]) == 0)
         send_specific_code(l, 230);
-
+    
 }
 
 void    cwd(list_t *l)

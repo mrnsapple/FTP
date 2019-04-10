@@ -7,16 +7,17 @@
 
 #include "list.h"
 
-int	select_encap(list_t *l)
+int select_encap(list_t *l)
 {
-	return (select (FD_SETSIZE, &(l->read_fd_set), NULL, NULL, NULL));
+    return (select (FD_SETSIZE, &(l->read_fd_set), NULL, NULL, NULL));
 }
 
-int	loop(list_t *l)
+int loop(list_t *l)
 {
 	l->ads = sizeof(struct sockaddr_in);
 	printf("INFO : Server started on port %d.\n", l->port);
 	while(1) {
+		
 		FD_ZERO (&(l->read_fd_set));
 		FD_SET (l->sock, &(l->read_fd_set));
 		add_client_to_sockket(l);
@@ -26,7 +27,6 @@ int	loop(list_t *l)
 			 	accept_client(i, l);
 				interact_with_client(i, l);
 			}
-		//fork_stuff(i, l);
 	} 
 	printf("outside_loop\n");
 	close(l->sock);

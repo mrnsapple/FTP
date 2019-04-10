@@ -7,7 +7,7 @@
 #define PORT 8080
 
 #ifndef LIST_H_
-	#define LIST_H_
+#define LIST_H_
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -36,6 +36,7 @@
 
 #define LEN_OPTIONS 15
 #define MAX_CLIENTS 30
+#define MAXMSG  512
 
 typedef struct  read
 {
