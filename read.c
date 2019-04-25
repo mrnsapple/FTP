@@ -7,28 +7,40 @@
 
 #include "list.h"
 
-void    initialize_clients(list_t   *l)
+int    add_clients(list_t   *l, int client)
 {
-    for (int i = 0; i < MAX_CLIENTS; i++)
-        l->client_socket[i] = 0;
+    client_sock_t *client_sock;
+
+    if (l == NULL)
+        return (84);
+    if (l->client_socket == NULL) {
+        l->client_socket = malloc(sizeof(client_sock_t));
+        client_sock = l->client_socket;
+    }
+    else {
+        client_sock = l->client_socket;
+        while (client_sock->next != NULL)
+            client_sock = client_sock->next; 
+    }
+    client_sock->client_socket = client;
+    return (0);
 }
 
-void    add_client_to_sockket(list_t    *l)
-{
-    for (int i = 0; i < MAX_CLIENTS; i++)
-        if (l->client_socket[i] > 0)
-            FD_SET(l->client_socket[i], &(l->read_fd_set));
+int   add_client_to_sockket(list_t    *l)
+{   
+    client_sock_t *client_sock;
+
+    if (l == NULL)
+        return (84);
+    client_sock = l->client_socket;
+    while (client_sock != NULL) {
+        printf("setting client: %d\n", client_sock->client_socket);
+        FD_SET(client_sock->client_socket, &(l->read_fd_set));
+        client_sock = client_sock->next;
+    }
+    return (0);
 }
 
-void	add_new_socket(list_t   *l, int   new_socket)
-{
-    for (int    i = 0; i < MAX_CLIENTS; i++)
-        if (l->client_socket[i] == 0) {
-            l->client_socket[i] = new_socket;
-            printf("added client:%d\n", l->client_socket[i]);
-            break;
-        }
-}
 
 int read_stuff(list_t   *l)
 {

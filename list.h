@@ -46,6 +46,12 @@ typedef struct  read
 
 } read_t;
 
+typedef struct  client_sock
+{
+    int client_socket;
+    struct client_sock *next;
+}   client_sock_t;
+
 typedef struct			list
 {
     int sock;
@@ -57,15 +63,15 @@ typedef struct			list
     int counter;
     read_t  *read;
     void (*options[LEN_OPTIONS])(struct list*);
-
-    int client_socket[MAX_CLIENTS];
+    client_sock_t   *client_socket;
+    //int client_socket[MAX_CLIENTS];
     int current_socket;
 }   list_t;
 
 int	select_encap(list_t *l);
 list_t	*set_reply_codes(list_t *l);
 int accept_client(int i, list_t *l);
-int interact_with_client(int i, list_t *l);
+int interact_with_client(list_t *l);
 
 void	set_socket(list_t *l);
 void	child_stuff(list_t *l);
@@ -76,8 +82,7 @@ int    len_array(char **av);
 char **my_str_to_wordtab(char *str, char x);
 void	send_specific_code(list_t *l, int specific_code);
 void	fork_stuff(int i, list_t *l);
-void    initialize_clients(list_t *l);
-void    add_client_to_sockket(list_t *l);
-void	add_new_socket(list_t *l, int new_socket);
+int    add_client_to_sockket(list_t *l);
+int    add_clients(list_t   *l, int client);
 
 #endif

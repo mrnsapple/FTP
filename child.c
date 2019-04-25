@@ -79,40 +79,43 @@ void    child_stuff(list_t *l)
 
 int accept_client(int   i, list_t *l)
 {
-    if (i == l->sock) {
-        printf("beforeaccept");
+    if (l != NULL && i == l->sock) {
         l->current_socket = accept(l->sock, (struct sockaddr*)&(l->adr),
                                    (socklen_t*)(&(l->ads)));
         if (l->current_socket < 0) {
             perror ("accept");
             return (84);
         }
-        add_new_socket(l, l->current_socket);
+        add_clients(l, l->current_socket);
         send_specific_code(l, 220);
     }
     return (0);
 }
 
-int interact_with_client(int i, list_t *l)
+int interact_with_client(list_t *l)
 {
     int sd;
-    
+    client_sock_t *client_sock;
+
     printf("\nafterinteract\n");
-    for (i = 0; i < MAX_CLIENTS; i++) {
-        if (FD_ISSET(sd , &l->read_fd_set)) {
+    if (l == NULL)
+        return (84);
+    client_sock = l->client_socket;
+    while (client_sock != NULL) {
+        if (FD_ISSET(sd, &l->read_fd_set)) {
             printf("client is not socket\n");
-            sd = l->client_socket[i];		
-            l->current_socket = l->client_socket[i];
+            sd = client_sock->client_socket;		
+            l->current_socket = client_sock->client_socket;
             if (read_stuff(l) > 0)
                 try_options(l);
         }
+        client_sock = client_sock->next;
     }
     printf("afterclient\n");
     return (0);
 }
 
-/*
-void	fork_stuff(int i, list_t *l)
+/*void	fork_stuff(int i, list_t *l)
 {
 	pid_t child_pid;
 	//int	status = 0;

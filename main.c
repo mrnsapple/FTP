@@ -24,8 +24,8 @@ int loop(list_t *l)
 		select_encap(l);
 		for (int i = 0; i < FD_SETSIZE; ++i)
 		 	if (FD_ISSET (i, &(l->read_fd_set))) {
-			 	accept_client(i, l);
-				interact_with_client(i, l);
+				accept_client(i, l);
+				interact_with_client(l);
 			}
 	} 
 	printf("outside_loop\n");
@@ -52,7 +52,6 @@ int main(int ac, char **av)
 		l->port = atoi(av[1]);
 		set_socket(l);
 		set_options(l);
-		initialize_clients(l);
 		return (loop(l));
 	}
 	return 84;
