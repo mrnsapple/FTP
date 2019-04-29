@@ -27,24 +27,6 @@ const char    *reply_codes[] = {
     NULL
 };
 
-int read_from_client (int filedes)
-{
-    char    buffer[MAXMSG];
-    int nbytes;
-
-    nbytes = read (filedes, buffer, MAXMSG);
-    if (nbytes < 0) {
-      perror ("read");
-      exit (EXIT_FAILURE);
-    }
-    else if (nbytes == 0)
-        return -1;
-    else {
-        fprintf (stderr, "Server: got message: `%s'\n", buffer);
-        return 0;
-    }
-}
-
 void    set_socket(list_t *l)
 {
     if ((l->sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
@@ -60,78 +42,53 @@ void    set_socket(list_t *l)
         perror("setsockopt_listen"); 
 }
 
-void    send_specific_code(list_t   *l, int   specific_code)
+void    send_specific_code(int current_socket, int   specific_code)
 {
     printf("sending code:%d\n", specific_code);
     for (int i = 0; reply_codes_num[i] != -1 ; i++)
         if (reply_codes_num[i] == specific_code)
-            write(l->current_socket, reply_codes[i], strlen(reply_codes[i]));
+            write(current_socket, reply_codes[i], strlen(reply_codes[i]));
 }
 
-void    child_stuff(list_t *l)	
-{	
-    send_specific_code(l, 220);
-    for (l->counter = 0; l->counter >= 0; l->counter++) {
-        read_stuff(l);
-        try_options(l);
-    }
+
+
+int    child_loop(int child_socket, void (*options[LEN_OPTIONS])(int child_socket, read_t  *read))
+{
+    send_specific_code(child_socket, 220);
+    while (1)
+        interact_with_client(child_socket, options);
+    return (0);
 }
 
 int accept_client(int   i, list_t *l)
 {
-    printf("in accept_client\n");
+    pid_t pid;
+    int child_socket;
+    int ads;
+    struct sockaddr_in adr;
+    
     if (l != NULL && i == l->sock) {
-        l->current_socket = accept(l->sock, (struct sockaddr*)&(l->adr),
-                                   (socklen_t*)(&(l->ads)));
-        if (l->current_socket < 0) {
+        child_socket = accept(l->sock, (struct sockaddr*)&(adr),
+                                   (socklen_t*)(&(ads)));
+        if (child_socket < 0) {
             perror ("accept");
             return (84);
-        }
-        
-        add_clients(&l->client_socket, l->current_socket);
-        print_current_clients(l->client_socket);
-        send_specific_code(l, 220);
+        }     
+        pid = fork();
+        if (pid < 0)
+            exit(84);
+        if (pid == 0 && child_loop(child_socket, l->options) == 84)
+            exit(84);
     }
     return (0);
 }
 
-int interact_with_client(list_t *l)
-{
-    int sd;
-    client_sock_t *client_sock;
+int interact_with_client(int child_socket,  void (*options[LEN_OPTIONS])(int child_socket, read_t  *read))
+{   
+    read_t  *read;
 
-    printf("\nafterinteract\n");
-    if (l == NULL)
-        return (84);
-    client_sock = l->client_socket;
-    while (client_sock != NULL) {
-        if (FD_ISSET(sd, &l->read_fd_set)) {
-            printf("client is not socket\n");
-            sd = client_sock->client_socket;		
-            l->current_socket = client_sock->client_socket;
-            if (read_stuff(l) > 0)
-                try_options(l);
-        }
-        client_sock = client_sock->next;
-    }
-    printf("afterclient\n");
+    read = read_stuff(child_socket);
+    if (read != NULL)
+        try_options(child_socket, read, options);
     return (0);
 }
-
-/*void	fork_stuff(int i, list_t *l)
-{
-	pid_t child_pid;
-	//int	status = 0;
-	//int	waitoptions = 0;
-
-	printf("\nNEW CLIENT\n");
-	child_pid = fork();
-	if (child_pid == -1) {
-		perror("error fork\n");
-		exit(84);
-	}
-	if (child_pid == 0)
-		inside_stuff(i, l);
-	//if (child_pid > 0)
-	//	child_pid = waitpid(child_pid, &status, waitoptions);
-}*/
