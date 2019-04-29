@@ -70,5 +70,5 @@ int    len_array(char **av);
 char **my_str_to_wordtab(char *str, char x);
 void    send_specific_code(int current_socket, int   specific_code);
 void	fork_stuff(int i, list_t *l);
-
+char *get_parent_dir(char *dir);
 #endif

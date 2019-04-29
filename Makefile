@@ -10,7 +10,7 @@ SRC	=	main.c					\
 		read.c					\
 		send.c					\
 		my_str_to_word_tab.c	\
-		pwd/get_pwd.c
+		instructions/get_pwd.c
 
 NAME	=	myftp
 

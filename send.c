@@ -25,23 +25,28 @@ void    password_authentification(int child_socket, read_t *read)
 void    cwd(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 2 &&
-        strcmp("CWD", read->buff_array[0]) == 0)
-        //dir = read->buff_array[1];
+        strcmp("CWD", read->buff_array[0]) == 0) {
+        read->dir = read->buff_array[1];
         send_specific_code(child_socket, 250);
+    }
 }
 
 void    cdup(int child_socket, read_t *read)
 {
-    if (read->buff_array_size == 2 &&
-        strcmp("CDUP", read->buff_array[0]) == 0)
+    if (read->buff_array_size == 1 &&
+        strcmp("CDUP", read->buff_array[0]) == 0) {
         send_specific_code(child_socket, 200);
+        read->dir = get_parent_dir(read->dir);    
+    }
 }
 
 void    quit(int child_socket, read_t *read)
 {
-    if (read->buff_array_size == 2 &&
-        strcmp("QUIT", read->buff_array[0]) == 0)
+    if (read->buff_array_size == 1 &&
+        strcmp("QUIT", read->buff_array[0]) == 0) {
         send_specific_code(child_socket, 221);
+        exit(0);
+    }
 }
 
 void    delete(int child_socket, read_t *read)
@@ -53,16 +58,22 @@ void    delete(int child_socket, read_t *read)
 
 void    pwd(int child_socket, read_t *read)
 {
-    if (read->buff_array_size == 2 &&
-        strcmp("PWD", read->buff_array[0]) == 0)
-        send_specific_code(child_socket, 257);
+    char *result;
+
+    if (read->buff_array_size == 1 &&
+        strcmp("PWD", read->buff_array[0]) == 0) {
+        result = "257 ";
+        strcat(result, read->dir);
+        strcat(result, " created.\n");
+        write(child_socket, result, strlen(result));
+    } 
 }
 
 void    pasv(int child_socket, read_t *read)
 {
-    if (read->buff_array_size == 2 &&
+    if (read->buff_array_size == 1 &&
         strcmp("PASV", read->buff_array[0]) == 0)
-        send_specific_code(child_socket, 227);
+            send_specific_code(child_socket, 227);
 }
 
 void    port(int child_socket, read_t *read)
@@ -139,6 +150,5 @@ int    try_options(int child_socket, read_t  *read, void (*options[LEN_OPTIONS])
         printf("dir:%s\n", read->dir);
 
     }
-
     return (0);
 }
