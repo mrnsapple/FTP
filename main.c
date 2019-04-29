@@ -53,10 +53,11 @@ int	my_ftp(int ac, char **av)
 	l = malloc(sizeof(list_t));
 
 	signal(SIGINT, close_socket);
-	if (ac == 2 && av != NULL && l != NULL) {
+	if (ac == 3 && av != NULL && l != NULL) {
 		if (strcmp("-help", av[1]) == 0)
 			return (print_help());
 		l->port = atoi(av[1]);
+		l->path = av[2];
 		set_socket(l);
 		set_options(l);
 		return (loop(l));

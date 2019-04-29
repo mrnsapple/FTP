@@ -7,14 +7,14 @@
 
 #include "list.h"
 
-void    user_authentification(int child_socket, read_t  *read)
+void    user_authentification(int child_socket, read_t  *read,char *dir)
 {
     if (read->buff_array_size == 2 &&
         strcmp("USER", read->buff_array[0]) == 0)
         send_specific_code(child_socket, 331);
 }
 
-void    password_authentification(int child_socket, read_t  *read)
+void    password_authentification(int child_socket, read_t  *read, char *dir)
 {
     if (read->buff_array_size == 2 &&
         strcmp("PASS", read->buff_array[0]) == 0)
@@ -22,84 +22,84 @@ void    password_authentification(int child_socket, read_t  *read)
     
 }
 
-void    cwd(int child_socket, read_t  *read)
+void    cwd(int child_socket, read_t  *read, char *dir)
 {
     if (read->buff_array_size == 2 &&
         strcmp("CWD", read->buff_array[0]) == 0)
         send_specific_code(child_socket, 250);
 }
 
-void    cdup(int child_socket, read_t  *read)
+void    cdup(int child_socket, read_t  *read, char *dir)
 {
     if (read->buff_array_size == 2 &&
         strcmp("CDUP", read->buff_array[0]) == 0)
         send_specific_code(child_socket, 200);
 }
 
-void    quit(int child_socket, read_t  *read)
+void    quit(int child_socket, read_t  *read, char *dir)
 {
     if (read->buff_array_size == 2 &&
         strcmp("QUIT", read->buff_array[0]) == 0)
         send_specific_code(child_socket, 221);
 }
 
-void    delete(int child_socket, read_t  *read)
+void    delete(int child_socket, read_t  *read, char *dir)
 {
     if (read->buff_array_size == 2 &&
         strcmp("DELETE", read->buff_array[0]) == 0)
         send_specific_code(child_socket, 250);
 }
 
-void    pwd(int child_socket, read_t  *read)
+void    pwd(int child_socket, read_t  *read, char *dir)
 {
     if (read->buff_array_size == 2 &&
         strcmp("PWD", read->buff_array[0]) == 0)
         send_specific_code(child_socket, 257);
 }
 
-void    pasv(int child_socket, read_t  *read)
+void    pasv(int child_socket, read_t  *read, char *dir)
 {
     if (read->buff_array_size == 2 &&
         strcmp("PASV", read->buff_array[0]) == 0)
         send_specific_code(child_socket, 227);
 }
 
-void    port(int child_socket, read_t  *read)
+void    port(int child_socket, read_t  *read, char *dir)
 {
     if (read->buff_array_size == 2 &&
         strcmp("PORT", read->buff_array[0]) == 0)
         send_specific_code(child_socket, 200);
 }
 
-void    help(int child_socket, read_t  *read)
+void    help(int child_socket, read_t  *read, char *dir)
 {
     if (read->buff_array_size == 2 &&
         strcmp("HELP", read->buff_array[0]) == 0)
         send_specific_code(child_socket, 214);
 }
 
-void    noop(int child_socket, read_t  *read)
+void    noop(int child_socket, read_t  *read, char *dir)
 {
     if (read->buff_array_size == 2 &&
         strcmp("NOOP", read->buff_array[0]) == 0)
         send_specific_code(child_socket, 200);
 }
 
-void    retr(int child_socket, read_t  *read)
+void    retr(int child_socket, read_t  *read, char *dir)
 {
     if (read->buff_array_size == 2 &&
         strcmp("RETR", read->buff_array[0]) == 0)
         send_specific_code(child_socket, 150);
 }
 
-void    stor(int child_socket, read_t  *read)
+void    stor(int child_socket, read_t  *read, char *dir)
 {
     if (read->buff_array_size == 2 &&
         strcmp("STOR", read->buff_array[0]) == 0)
         send_specific_code(child_socket, 150);
 }
 
-void    list(int child_socket, read_t  *read)
+void    list(int child_socket, read_t  *read, char *dir)
 {
     if (read->buff_array_size == 2 &&
         strcmp("LIST", read->buff_array[0]) == 0)
@@ -125,7 +125,7 @@ void    set_options(list_t *l)
     l->options[13] = NULL;
 }
 
-int    try_options(int child_socket, read_t  *read, void (*options[LEN_OPTIONS])(int child_socket, read_t  *read))
+int    try_options(int child_socket, read_t  *read, void (*options[LEN_OPTIONS])(int child_socket, read_t  *read, char *dir), char *dir)
 {
     if (read == NULL)
         return (-1);
@@ -133,7 +133,7 @@ int    try_options(int child_socket, read_t  *read, void (*options[LEN_OPTIONS])
         printf("s:%s\n", read->buff_array[i]);
     }
     for (int i = 0; options[i] != NULL; i++) {
-        (options[i])(child_socket, read);
+        (options[i])(child_socket, read, dir);
     }
     return (0);
 }
