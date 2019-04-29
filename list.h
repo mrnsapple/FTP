@@ -83,6 +83,7 @@ char **my_str_to_wordtab(char *str, char x);
 void	send_specific_code(list_t *l, int specific_code);
 void	fork_stuff(int i, list_t *l);
 int    add_client_to_sockket(list_t *l);
-int    add_clients(list_t   *l, int client);
+int    add_clients(client_sock_t **client_list, int client_value);
+void	print_current_clients(client_sock_t   *client_socket);
 
 #endif

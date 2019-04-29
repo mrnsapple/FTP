@@ -7,22 +7,26 @@
 
 #include "list.h"
 
-int    add_clients(list_t   *l, int client)
+int    add_clients(client_sock_t **client_list, int client_value)
 {
     client_sock_t *client_sock;
+    client_sock_t *client = *client_list;
 
-    if (l == NULL)
-        return (84);
-    if (l->client_socket == NULL) {
-        l->client_socket = malloc(sizeof(client_sock_t));
-        client_sock = l->client_socket;
+    client_sock = malloc(sizeof(client_sock_t));
+    client_sock->client_socket = client_value;
+    client_sock->next = NULL;
+    if (client == NULL) {
+        printf("in if\n");
+
+        (*client_list) = client_sock;
     }
     else {
-        client_sock = l->client_socket;
-        while (client_sock->next != NULL)
-            client_sock = client_sock->next; 
+        while (client->next != NULL) {
+            printf("in while\n");
+           client = client->next;
+        }
+        client->next = client_sock;
     }
-    client_sock->client_socket = client;
     return (0);
 }
 

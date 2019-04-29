@@ -79,6 +79,7 @@ void    child_stuff(list_t *l)
 
 int accept_client(int   i, list_t *l)
 {
+    printf("in accept_client\n");
     if (l != NULL && i == l->sock) {
         l->current_socket = accept(l->sock, (struct sockaddr*)&(l->adr),
                                    (socklen_t*)(&(l->ads)));
@@ -86,7 +87,9 @@ int accept_client(int   i, list_t *l)
             perror ("accept");
             return (84);
         }
-        add_clients(l, l->current_socket);
+        
+        add_clients(&l->client_socket, l->current_socket);
+        print_current_clients(l->client_socket);
         send_specific_code(l, 220);
     }
     return (0);
