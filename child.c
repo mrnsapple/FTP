@@ -52,13 +52,17 @@ void    send_specific_code(int current_socket, int   specific_code)
 
 
 
-int    child_loop(int child_socket, void (*options[LEN_OPTIONS])(int child_socket, read_t  *read, char *dir), char *dir)
+int    child_loop(int child_socket, void (*options[LEN_OPTIONS])(int child_socket, read_t  *read), char *dir)
 {
+    read_t *read;
+
+    read = malloc(sizeof(read_t));
+    read->dir = dir;
 
     printf("current:%s\n", dir);
     send_specific_code(child_socket, 220);
     while (1)
-        interact_with_client(child_socket, options, dir);
+        interact_with_client(child_socket, options, read);
     return (0);
 }
 
@@ -85,12 +89,10 @@ int accept_client(int   i, list_t *l)
     return (0);
 }
 
-int interact_with_client(int child_socket,  void (*options[LEN_OPTIONS])(int child_socket, read_t  *read, char *dir), char *dir)
+int interact_with_client(int child_socket,  void (*options[LEN_OPTIONS])(int child_socket, read_t  *read), read_t *read)
 {   
-    read_t  *read;
-
-    read = read_stuff(child_socket);
+    read = read_stuff(child_socket, read);
     if (read != NULL)
-        try_options(child_socket, read, options, dir);
+        try_options(child_socket, read, options);
     return (0);
 }

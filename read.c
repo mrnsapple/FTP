@@ -30,12 +30,10 @@
     return (0);
 }*/
 
-read_t  *read_stuff(int child_socket)
+read_t  *read_stuff(int child_socket, read_t *reader)
 {
-    read_t  *reader;
     int result;
 
-    reader = malloc(sizeof(read_t));
     if (reader == NULL)
         return (NULL);
     //printf("current:%d",l->current_socket);
