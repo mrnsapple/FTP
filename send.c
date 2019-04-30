@@ -9,6 +9,7 @@
 
 int    chose_and_send_code(int child_socket, int specific_code, read_t *read)
 {
+    read->any_instruction_sent = 1;
     //it becomes 2 when pasword is sent
     if (read->is_autentificated == 0 || read->is_autentificated == 1) {
         send_specific_code(child_socket, 530);
@@ -24,6 +25,7 @@ void    user_authentification(int child_socket, read_t  *read)
         strcmp("USER", read->buff_array[0]) == 0) {
             send_specific_code(child_socket, 331);
             read->is_autentificated = 1;
+            read->any_instruction_sent = 1;
         }
 
 }
@@ -32,6 +34,8 @@ void    password_authentification(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 2 &&
         strcmp("PASS", read->buff_array[0]) == 0) {
+        if (read->is_autentificated == 0 || read->is_autentificated == 1)
+            read->any_instruction_sent = 1;
         if (read->is_autentificated == 0)
             send_specific_code(child_socket, 530);
         else if (read->is_autentificated == 1) {
@@ -72,6 +76,7 @@ void    delete(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 2 &&
         strcmp("DELETE", read->buff_array[0]) == 0) {
+        read->any_instruction_sent = 1;
         if (read->is_autentificated == 0 || read->is_autentificated == 1)
             send_specific_code(child_socket, 530);
         else if (remove(read->buff_array[0]) == 0) 
@@ -87,6 +92,7 @@ void    pwd(int child_socket, read_t *read)
 
     if (read->buff_array_size == 1 &&
         strcmp("PWD", read->buff_array[0]) == 0) {
+        read->any_instruction_sent = 1;
         if (read->is_autentificated == 0 || read->is_autentificated == 1)
             send_specific_code(child_socket, 530);
         else {
@@ -147,6 +153,12 @@ void    list(int child_socket, read_t *read)
         chose_and_send_code(child_socket, 150, read);
 }
 
+void syntax_error(int child_socket, read_t *read)
+{
+    if (read->buff_array == NULL || strcmp("", read->buff_array[0]) == 0 || read->any_instruction_sent == 0)
+        send_specific_code(child_socket, 500);
+}
+
 void    set_options(list_t *l)
 {
     l->options[0] = &user_authentification;
@@ -163,13 +175,15 @@ void    set_options(list_t *l)
     l->options[11] = &retr;
     l->options[12] = &stor;
     l->options[12] = &list;
-    l->options[13] = NULL;
+    l->options[13] = &syntax_error;
+    l->options[14] = NULL;
 }
 
 int    try_options(int child_socket, read_t  *read, void (*options[LEN_OPTIONS])(int child_socket, read_t *read))
 {
     if (read == NULL)
         return (-1);
+    read->any_instruction_sent = 0;
     for(int i = 0; read->buff_array[i] != NULL; i++) {
         printf("s:%s, dir:%s\n", read->buff_array[i],read->dir);
     }
@@ -177,7 +191,7 @@ int    try_options(int child_socket, read_t  *read, void (*options[LEN_OPTIONS])
         //printf("doing option\n");
         (options[i])(child_socket, read);
         //printf("dir:%s\n", read->dir);
-
     }
+    read->any_instruction_sent = 0;
     return (0);
 }

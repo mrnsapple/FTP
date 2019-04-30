@@ -61,5 +61,7 @@ read_t  *read_stuff(int child_socket, read_t *reader)
     reader->buff_array = my_str_to_wordtab(av, ' ');
     reader->buff_array = delete_spaces(reader->buff_array);
     reader->buff_array_size = len_array(reader->buff_array);
+    for (int i = 0; reader->buff_array[i] != NULL; i++)
+        printf("reader:%s:\n", reader->buff_array[i]);
     return (reader);
 }
