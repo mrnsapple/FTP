@@ -72,7 +72,7 @@ void    delete(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 2 &&
         strcmp("DELETE", read->buff_array[0]) == 0) {
-        if (read->is_autentificated == 0)
+        if (read->is_autentificated == 0 || read->is_autentificated == 1)
             send_specific_code(child_socket, 530);
         else if (remove(read->buff_array[0]) == 0) 
             send_specific_code(child_socket, 250);
@@ -87,7 +87,7 @@ void    pwd(int child_socket, read_t *read)
 
     if (read->buff_array_size == 1 &&
         strcmp("PWD", read->buff_array[0]) == 0) {
-        if (read->is_autentificated == 0)
+        if (read->is_autentificated == 0 || read->is_autentificated == 1)
             send_specific_code(child_socket, 530);
         else {
             strcpy(result,"257 ");
@@ -114,7 +114,7 @@ void    port(int child_socket, read_t *read)
 
 void    help(int child_socket, read_t *read)
 {
-    if (read->buff_array_size == 2 &&
+    if (read->buff_array_size == 1 &&
         strcmp("HELP", read->buff_array[0]) == 0)
         chose_and_send_code(child_socket, 214, read);
 }
