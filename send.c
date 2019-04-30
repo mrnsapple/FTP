@@ -25,12 +25,16 @@ void    user_authentification(int child_socket, read_t  *read)
         send_specific_code(child_socket, 331);
         read->is_autentificated = 1;
         read->any_instruction_sent = 1;
+        if (strcmp("Anonymous", read->buff_array[1]) == 0)
+            read->is_anonimous = 1;
+
     }
 }
 
 void    password_authentification(int child_socket, read_t *read)
 {
-    if (read->buff_array_size == 2 &&
+    //printf("size:%d\n", read->buff_array_size);
+    if ((read->buff_array_size == 2  || (read->buff_array_size == 1 && read->is_anonimous == 1)) &&
         strcmp("PASS", read->buff_array[0]) == 0) {
         if (read->is_autentificated == 0 || read->is_autentificated == 1)
             read->any_instruction_sent = 1;

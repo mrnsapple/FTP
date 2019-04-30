@@ -62,6 +62,8 @@ int child_loop(int  child_socket,
     read = malloc(sizeof(read_t));
     read->dir = dir;
     read->is_autentificated = 0;
+    read->is_anonimous = 0;
+
     send_specific_code(child_socket, 220);
     while (1)
         interact_with_client(child_socket, options, read);

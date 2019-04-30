@@ -46,6 +46,7 @@ typedef struct  read
     char *dir;
     int is_autentificated;
     int any_instruction_sent;
+    int is_anonimous;
 } read_t;
 
 typedef struct  list
