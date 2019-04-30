@@ -32,18 +32,18 @@ const char  *reply_codes[] = {
     NULL
 };
 
-void    set_socket(list_t *l)
+void    set_socket(list_t *my_var)
 {
-    if ((l->sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+    if ((my_var->sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
         perror("setsockopt"); 
         exit(EXIT_FAILURE);   
     }
-    l->addr.sin_family = AF_INET;
-    l->addr.sin_addr.s_addr = INADDR_ANY;
-    l->addr.sin_port = htons(l->port);
-    if (bind(l->sock, (struct sockaddr *)&(l->addr), sizeof(l->addr)) == -1)
+    my_var->addr.sin_family = AF_INET;
+    my_var->addr.sin_addr.s_addr = INADDR_ANY;
+    my_var->addr.sin_port = htons(my_var->port);
+    if (bind(my_var->sock, (struct sockaddr *)&(my_var->addr), sizeof(my_var->addr)) == -1)
         perror("setsockopt_bind"); 
-    if (listen(l->sock, MAX_CLIENTS) == -1)
+    if (listen(my_var->sock, MAX_CLIENTS) == -1)
         perror("setsockopt_listen"); 
 }
 
@@ -54,7 +54,8 @@ void    send_specific_code(int current_socket, int   specific_code)
             write(current_socket, reply_codes[i], strlen(reply_codes[i]));
 }
 
-int child_loop(int  child_socket, void  (*options[LEN_OPTIONS])(int child_socket, read_t  *read), char *dir)
+int child_loop(int  child_socket,
+               void  (*options[LEN_OPTIONS])(int child_socket, read_t  *read), char *dir)
 {
     read_t  *read;
 
@@ -67,15 +68,15 @@ int child_loop(int  child_socket, void  (*options[LEN_OPTIONS])(int child_socket
     return (0);
 }
 
-int accept_client(int   i, list_t *l)
+int accept_client(int   i, list_t *my_var)
 {
     pid_t pid;
     int child_socket;
     int ads;
     struct sockaddr_in adr;
     
-    if (l != NULL && i == l->sock) {
-        child_socket = accept(l->sock, (struct sockaddr*)&(adr),
+    if (my_var != NULL && i == my_var->sock) {
+        child_socket = accept(my_var->sock, (struct sockaddr*)&(adr),
                                    (socklen_t*)(&(ads)));
         if (child_socket < 0) {
             perror ("accept");
@@ -84,13 +85,14 @@ int accept_client(int   i, list_t *l)
         pid = fork();
         if (pid < 0)
             exit(84);
-        if (pid == 0 && child_loop(child_socket, l->options, l->path) == 84)
+        if (pid == 0 && child_loop(child_socket, my_var->options, my_var->path) == 84)
             exit(84);
     }
     return (0);
 }
 
-int interact_with_client(int child_socket,  void (*options[LEN_OPTIONS])(int child_socket, read_t  *read), read_t *read)
+int interact_with_client(int child_socket,
+                         void (*options[LEN_OPTIONS])(int child_socket, read_t  *read), read_t *read)
 {   
     read = read_stuff(child_socket, read);
     if (read != NULL)

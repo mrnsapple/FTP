@@ -12,7 +12,7 @@
 #include <string.h> 
 #include <unistd.h>
 #include <arpa/inet.h>
-
+/*
 int main(int argc, char const **av) 
 { 
 	int sock = 0, valread; 
@@ -48,3 +48,4 @@ int main(int argc, char const **av)
 	//}
 	return 0; 
 } 
+*/

@@ -8,6 +8,7 @@
 
 #ifndef LIST_H_
 #define LIST_H_
+
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -47,12 +48,11 @@ typedef struct  read
     int any_instruction_sent;
 } read_t;
 
-typedef struct			list
+typedef struct  list
 {
     int sock;
-	int port;
+    int port;
     char    *path;
-
     fd_set read_fd_set;
     struct sockaddr_in addr;
     void (*options[LEN_OPTIONS])(int child_socket, read_t  *read);
@@ -60,17 +60,19 @@ typedef struct			list
 }   list_t;
 
 int select_encap(fd_set *read_fd_set);
-list_t	*set_reply_codes(list_t *l);
-int accept_client(int i, list_t *l);
-int interact_with_client(int child_socket,  void (*options[LEN_OPTIONS])(int child_socket, read_t  *read), read_t *read);
+list_t	*set_reply_codes(list_t *my_var);
+int accept_client(int i, list_t *my_var);
+int interact_with_client(int child_socket,
+                         void (*options[LEN_OPTIONS])(int child_socket, read_t  *read), read_t *read);
 read_t  *read_stuff(int child_socket, read_t *reader);
 
-void	set_socket(list_t *l);
-void    set_options(list_t *l);
-int    try_options(int child_socket, read_t  *read, void (*options[LEN_OPTIONS])(int child_socket, read_t  *read));
+void	set_socket(list_t *my_var);
+void    set_options(list_t *my_var);
+int    try_options(int child_socket, read_t  *read,
+                   void (*options[LEN_OPTIONS])(int child_socket, read_t  *read));
 int    len_array(char **av);
 char **my_str_to_wordtab(char *str, char x);
 void    send_specific_code(int current_socket, int   specific_code);
-void	fork_stuff(int i, list_t *l);
+void	fork_stuff(int i, list_t *my_var);
 char *get_parent_dir(char *dir);
 #endif

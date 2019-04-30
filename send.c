@@ -156,27 +156,28 @@ void    syntax_error(int child_socket, read_t *read)
         send_specific_code(child_socket, 500);
 }
 
-void    set_options(list_t *l)
+void    set_options(list_t *my_var)
 {
-    l->options[0] = &user_authentification;
-    l->options[1] = &password_authentification;
-    l->options[2] = &cwd;
-    l->options[3] = &cdup;
-    l->options[4] = &quit;
-    l->options[5] = &delete;
-    l->options[6] = &pwd;
-    l->options[7] = &pasv;
-    l->options[8] = &port;
-    l->options[9] = &help;
-    l->options[10] = &noop;
-    l->options[11] = &retr;
-    l->options[12] = &stor;
-    l->options[12] = &list;
-    l->options[13] = &syntax_error;
-    l->options[14] = NULL;
+    my_var->options[0] = &user_authentification;
+    my_var->options[1] = &password_authentification;
+    my_var->options[2] = &cwd;
+    my_var->options[3] = &cdup;
+    my_var->options[4] = &quit;
+    my_var->options[5] = &delete;
+    my_var->options[6] = &pwd;
+    my_var->options[7] = &pasv;
+    my_var->options[8] = &port;
+    my_var->options[9] = &help;
+    my_var->options[10] = &noop;
+    my_var->options[11] = &retr;
+    my_var->options[12] = &stor;
+    my_var->options[12] = &list;
+    my_var->options[13] = &syntax_error;
+    my_var->options[14] = NULL;
 }
 
-int    try_options(int child_socket, read_t  *read, void (*options[LEN_OPTIONS])(int child_socket, read_t *read))
+int    try_options(int child_socket, read_t  *read,
+ void (*options[LEN_OPTIONS])(int child_socket, read_t *read))
 {
     if (read == NULL)
         return (-1);

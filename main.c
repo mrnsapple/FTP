@@ -7,27 +7,27 @@
 
 #include "list.h"
 
-list_t *l;
+list_t *my_var;
 
 int select_encap(fd_set *read_fd_set)
 {
     return (select (FD_SETSIZE, read_fd_set, NULL, NULL, NULL));
 }
 
-int loop(list_t *l)
+int loop(list_t *my_var)
 {
-    printf("INFO : Server started on port %d.\n", l->port);
+    printf("INFO : Server started on port %d.\n", my_var->port);
     while(1) {
-        FD_ZERO (&(l->read_fd_set));
-        FD_SET (l->sock, &(l->read_fd_set));
-        select_encap(&(l->read_fd_set));
+        FD_ZERO (&(my_var->read_fd_set));
+        FD_SET (my_var->sock, &(my_var->read_fd_set));
+        select_encap(&(my_var->read_fd_set));
         for (int i = 0; i < FD_SETSIZE; ++i)
-            if (FD_ISSET (i, &(l->read_fd_set))) {
-                accept_client(i, l);
+            if (FD_ISSET (i, &(my_var->read_fd_set))) {
+                accept_client(i, my_var);
             }
     } 
     printf("outside_loop\n");
-    close(l->sock);
+    close(my_var->sock);
     return 0;	
 }
 
@@ -41,9 +41,9 @@ int print_help(void)
 
 void    close_socket(int sock)
 {
-    if (l != NULL) {
-        close(l->sock);
-        printf("closed _soket: %d\n", l->sock);
+    if (my_var != NULL) {
+        close(my_var->sock);
+        printf("closed _soket: %d\n", my_var->sock);
     }
     if (sock == 0)
         exit(0);
@@ -52,17 +52,16 @@ void    close_socket(int sock)
 
 int	my_ftp(int ac, char **av)
 {
-    l = malloc(sizeof(list_t));
-    
+    my_var = malloc(sizeof(list_t));
     signal(SIGINT, close_socket);
-    if (ac == 3 && av != NULL && l != NULL) {
+    if (ac == 3 && av != NULL && my_var != NULL) {
         if (strcmp("-help", av[1]) == 0)
             return (print_help());
-        l->port = atoi(av[1]);
-        l->path = av[2];
-        set_socket(l);
-        set_options(l);
-        return (loop(l));
+        my_var->port = atoi(av[1]);
+        my_var->path = av[2];
+        set_socket(my_var);
+        set_options(my_var);
+        return (loop(my_var));
     }
     return 84;
 }
