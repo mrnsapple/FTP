@@ -83,17 +83,18 @@ void    delete(int child_socket, read_t *read)
 
 void    pwd(int child_socket, read_t *read)
 {
-    char *result;
+    char result[200];
 
     if (read->buff_array_size == 1 &&
         strcmp("PWD", read->buff_array[0]) == 0) {
-        result = "257 ";
-        strcat(result, read->dir);
-        strcat(result, " created.\n");
         if (read->is_autentificated == 0)
             send_specific_code(child_socket, 530);
-        else
+        else {
+            strcpy(result,"257 ");
+            strcat(result,read->dir );
+            strcat(result, " created.\n");        
             write(child_socket, result, strlen(result));
+        }
     } 
 }
 
@@ -173,9 +174,9 @@ int    try_options(int child_socket, read_t  *read, void (*options[LEN_OPTIONS])
         printf("s:%s, dir:%s\n", read->buff_array[i],read->dir);
     }
     for (int i = 0; options[i] != NULL; i++) {
-        printf("doing option\n");
+        //printf("doing option\n");
         (options[i])(child_socket, read);
-        printf("dir:%s\n", read->dir);
+        //printf("dir:%s\n", read->dir);
 
     }
     return (0);

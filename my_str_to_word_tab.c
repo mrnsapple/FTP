@@ -46,8 +46,11 @@ char **my_str_to_wordtab(char *str, char x)
 
 int    len_array(char **av)
 {
-    int result = 0;
+		int result = 0;
 
-    for (result = 0; av != NULL && av[result] != NULL; result++);
-    return (result);
+		for (result = 0; av != NULL && av[result] != NULL; result++);
+		if (result <= 0)
+			return 0;
+		result = result - 1;
+		return (result);
 }

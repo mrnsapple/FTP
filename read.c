@@ -30,24 +30,36 @@
     return (0);
 }*/
 
+char   **delete_spaces(char **av)
+{
+    if (av == NULL)
+        return (NULL);
+    for (int i = 0; av[i] != NULL; i++)
+        for (int g = 0; av[i][g] != '\0'; g++)
+            if (av[i][g] == '\n' || av[i][g] == '\t')
+                av[i][g] = '\0';
+    return (av);
+}
+
 read_t  *read_stuff(int child_socket, read_t *reader)
 {
     int result;
-
+    char *av;
+    
     if (reader == NULL)
         return (NULL);
-    //printf("current:%d",l->current_socket);
     bzero(reader->buff, 2000);
-    //printf("current:%d",l->current_socket);
     result = read(child_socket, reader->buff, 2000);
-    //printf("read:%s\n", l->read->buff);
     if (result <= 0) {
-        //perror("read error\n");
         free(reader);
         return (NULL);
     }
+    reader->buff[result - 2] = ' ';
+    reader->buff[result - 1] = '\n';
     reader->buff[result] = '\0';
-    reader->buff_array = my_str_to_wordtab(reader->buff, ' ');
+    av = strcat(reader->buff, "");
+    reader->buff_array = my_str_to_wordtab(av, ' ');
+    reader->buff_array = delete_spaces(reader->buff_array);
     reader->buff_array_size = len_array(reader->buff_array);
     return (reader);
 }
