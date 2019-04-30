@@ -13,8 +13,8 @@ char *get_parent_dir(char *dir)
 {
     int i = 0;
     int size;
-	char *result;
-
+    char *result;
+    
     if (dir == NULL)
         return (NULL);
     size = strlen(dir);
@@ -29,21 +29,4 @@ char *get_parent_dir(char *dir)
         result[g] = dir[g];
     result[size - i - 1] = '\0';
     return (result);
-    
 }
-/*
-int main()
-{
-    printf("dir:%s\n", get_parent_dir("/home/oriol/"));
-        printf("dir:%s\n", get_parent_dir("/home"));
-                printf("dir:%s\n", get_parent_dir("/"));
-}*/
-/*char    *get_working_dir(void)
-{
-	char	cwd[1024];
-
-	if (getcwd(cwd, 1024) != NULL)
-        return (cwd);
-    return (NULL);
-}
-*/

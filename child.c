@@ -7,9 +7,10 @@
 
 #include "list.h"
 
-const int reply_codes_num[] = {120, 125, 150, 200, 214, 220, 221, 226, 227,
+const int   reply_codes_num[] = {120, 125, 150, 200, 214, 220, 221, 226, 227,
                           230, 250, 257, 331, 332, 530, 550, 500, 444, -1};
-const char    *reply_codes[] = { 
+
+const char  *reply_codes[] = { 
     "120 Service ready in nnn minutes.\n",
     "125 Data connection already open; transfer starting.\n",
     "150 File status okay; about to open data connection.\n",
@@ -48,20 +49,18 @@ void    set_socket(list_t *l)
 
 void    send_specific_code(int current_socket, int   specific_code)
 {
-    printf("sending code:%d\n", specific_code);
     for (int i = 0; reply_codes_num[i] != -1 ; i++)
         if (reply_codes_num[i] == specific_code)
             write(current_socket, reply_codes[i], strlen(reply_codes[i]));
 }
 
-int    child_loop(int child_socket, void (*options[LEN_OPTIONS])(int child_socket, read_t  *read), char *dir)
+int child_loop(int  child_socket, void  (*options[LEN_OPTIONS])(int child_socket, read_t  *read), char *dir)
 {
-    read_t *read;
+    read_t  *read;
 
     read = malloc(sizeof(read_t));
     read->dir = dir;
     read->is_autentificated = 0;
-    printf("current:%s\n", dir);
     send_specific_code(child_socket, 220);
     while (1)
         interact_with_client(child_socket, options, read);
