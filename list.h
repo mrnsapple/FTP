@@ -43,6 +43,7 @@ typedef struct  read
     char **buff_array;
     int buff_array_size;
     char *dir;
+    int is_autentificated;
 } read_t;
 
 typedef struct			list

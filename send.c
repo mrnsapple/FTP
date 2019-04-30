@@ -7,18 +7,29 @@
 
 #include "list.h"
 
+int    chose_and_send_code(int child_socket, int specific_code, read_t *read)
+{
+    if (read->is_autentificated == 0) {
+        send_specific_code(child_socket, 530);
+        return (-1);
+    }
+    send_specific_code(child_socket, specific_code);
+    return (0);
+}
+
 void    user_authentification(int child_socket, read_t  *read)
 {
     if (read->buff_array_size == 2 &&
         strcmp("USER", read->buff_array[0]) == 0)
-        send_specific_code(child_socket, 331);
+            chose_and_send_code(child_socket, 331, read);
+
 }
 
 void    password_authentification(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 2 &&
         strcmp("PASS", read->buff_array[0]) == 0)
-        send_specific_code(child_socket, 230);
+            chose_and_send_code(child_socket, 230, read);
     
 }
 
@@ -26,8 +37,8 @@ void    cwd(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 2 &&
         strcmp("CWD", read->buff_array[0]) == 0) {
-        read->dir = read->buff_array[1];
-        send_specific_code(child_socket, 250);
+        if (chose_and_send_code(child_socket, 250, read) == 0)
+            read->dir = read->buff_array[1];
     }
 }
 
@@ -35,8 +46,8 @@ void    cdup(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 1 &&
         strcmp("CDUP", read->buff_array[0]) == 0) {
-        send_specific_code(child_socket, 200);
-        read->dir = get_parent_dir(read->dir);    
+        if (chose_and_send_code(child_socket, 200, read) == 0)
+            read->dir = get_parent_dir(read->dir);    
     }
 }
 
@@ -44,7 +55,7 @@ void    quit(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 1 &&
         strcmp("QUIT", read->buff_array[0]) == 0) {
-        send_specific_code(child_socket, 221);
+        chose_and_send_code(child_socket, 221, read);
         exit(0);
     }
 }
@@ -52,8 +63,14 @@ void    quit(int child_socket, read_t *read)
 void    delete(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 2 &&
-        strcmp("DELETE", read->buff_array[0]) == 0)
-        send_specific_code(child_socket, 250);
+        strcmp("DELETE", read->buff_array[0]) == 0) {
+        if (read->is_autentificated == 0)
+            send_specific_code(child_socket, 530);
+        else if (remove(read->buff_array[0]) == 0) 
+            send_specific_code(child_socket, 250);
+        else
+            send_specific_code(child_socket, 550);  
+    }
 }
 
 void    pwd(int child_socket, read_t *read)
@@ -65,7 +82,10 @@ void    pwd(int child_socket, read_t *read)
         result = "257 ";
         strcat(result, read->dir);
         strcat(result, " created.\n");
-        write(child_socket, result, strlen(result));
+        if (read->is_autentificated == 0)
+            send_specific_code(child_socket, 530);
+        else
+            write(child_socket, result, strlen(result));
     } 
 }
 
@@ -73,49 +93,49 @@ void    pasv(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 1 &&
         strcmp("PASV", read->buff_array[0]) == 0)
-            send_specific_code(child_socket, 227);
+            chose_and_send_code(child_socket, 227, read);
 }
 
 void    port(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 2 &&
         strcmp("PORT", read->buff_array[0]) == 0)
-        send_specific_code(child_socket, 200);
+            chose_and_send_code(child_socket, 200, read);
 }
 
 void    help(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 2 &&
         strcmp("HELP", read->buff_array[0]) == 0)
-        send_specific_code(child_socket, 214);
+        chose_and_send_code(child_socket, 214, read);
 }
 
 void    noop(int child_socket, read_t *read)
 {
-    if (read->buff_array_size == 2 &&
+    if (read->buff_array_size == 1 &&
         strcmp("NOOP", read->buff_array[0]) == 0)
-        send_specific_code(child_socket, 200);
+            chose_and_send_code(child_socket, 200, read);
 }
 
 void    retr(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 2 &&
         strcmp("RETR", read->buff_array[0]) == 0)
-        send_specific_code(child_socket, 150);
+            chose_and_send_code(child_socket, 150, read);
 }
 
 void    stor(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 2 &&
         strcmp("STOR", read->buff_array[0]) == 0)
-        send_specific_code(child_socket, 150);
+        chose_and_send_code(child_socket, 150, read);
 }
 
 void    list(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 2 &&
         strcmp("LIST", read->buff_array[0]) == 0)
-        send_specific_code(child_socket, 150);
+        chose_and_send_code(child_socket, 150, read);
 }
 
 void    set_options(list_t *l)

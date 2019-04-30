@@ -8,7 +8,7 @@
 #include "list.h"
 
 const int reply_codes_num[] = {120, 125, 150, 200, 214, 220, 221, 226, 227,
-                          230, 250, 257, 331, 333, -1};
+                          230, 250, 257, 331, 332, 530, 550, 444, -1};
 const char    *reply_codes[] = { 
     "120 Service ready in nnn minutes.\n",
     "125 Data connection already open; transfer starting.\n",
@@ -24,6 +24,9 @@ const char    *reply_codes[] = {
     "257 \"PATHNAME\" created.\n",
     "331 User name okay, need password.\n",
     "332 Need account for login.\n",
+    "530 Not logged in.\n",
+    "550 Requested action not taken. File unavailable (e.g., file not found, no access).\n",
+    "xxx Error (RFC compliant)\n",
     NULL
 };
 
@@ -50,15 +53,13 @@ void    send_specific_code(int current_socket, int   specific_code)
             write(current_socket, reply_codes[i], strlen(reply_codes[i]));
 }
 
-
-
 int    child_loop(int child_socket, void (*options[LEN_OPTIONS])(int child_socket, read_t  *read), char *dir)
 {
     read_t *read;
 
     read = malloc(sizeof(read_t));
     read->dir = dir;
-
+    read->is_autentificated = 0;
     printf("current:%s\n", dir);
     send_specific_code(child_socket, 220);
     while (1)
