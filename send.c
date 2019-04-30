@@ -9,7 +9,8 @@
 
 int    chose_and_send_code(int child_socket, int specific_code, read_t *read)
 {
-    if (read->is_autentificated == 0) {
+    //it becomes 2 when pasword is sent
+    if (read->is_autentificated == 0 || read->is_autentificated == 1) {
         send_specific_code(child_socket, 530);
         return (-1);
     }
@@ -20,17 +21,24 @@ int    chose_and_send_code(int child_socket, int specific_code, read_t *read)
 void    user_authentification(int child_socket, read_t  *read)
 {
     if (read->buff_array_size == 2 &&
-        strcmp("USER", read->buff_array[0]) == 0)
-            chose_and_send_code(child_socket, 331, read);
+        strcmp("USER", read->buff_array[0]) == 0) {
+            send_specific_code(child_socket, 331);
+            read->is_autentificated = 1;
+        }
 
 }
 
 void    password_authentification(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 2 &&
-        strcmp("PASS", read->buff_array[0]) == 0)
-            chose_and_send_code(child_socket, 230, read);
-    
+        strcmp("PASS", read->buff_array[0]) == 0) {
+        if (read->is_autentificated == 0)
+            send_specific_code(child_socket, 530);
+        else if (read->is_autentificated == 1) {
+            send_specific_code(child_socket, 230);
+            read->is_autentificated = 2;
+        }    
+    }
 }
 
 void    cwd(int child_socket, read_t *read)
