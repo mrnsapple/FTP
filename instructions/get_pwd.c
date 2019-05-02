@@ -14,12 +14,11 @@ char *get_parent_dir(char *dir)
     int i = 0;
     int size;
     char *result;
-    
+
     if (dir == NULL)
         return (NULL);
     size = strlen(dir);
     for (i = 0; dir[i] != '\0'; i++);
-
     for (i = i; i >= 0 && dir[i] != '/' ; i--);
     if (i == 0)
         return ("/");

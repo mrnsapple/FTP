@@ -18,7 +18,7 @@ int chose_and_send_code(int child_socket, int specific_code, read_t *read)
     return (0);
 }
 
-void    user_authentification(int child_socket, read_t  *read)
+void user_authentification(int child_socket, read_t  *read)
 {
     if (read->buff_array_size == 2 &&
         strcmp("USER", read->buff_array[0]) == 0) {
@@ -27,13 +27,11 @@ void    user_authentification(int child_socket, read_t  *read)
         read->any_instruction_sent = 1;
         if (strcmp("Anonymous", read->buff_array[1]) == 0)
             read->is_anonimous = 1;
-
     }
 }
 
-void    password_authentification(int child_socket, read_t *read)
+void password_authentification(int child_socket, read_t *read)
 {
-    //printf("size:%d\n", read->buff_array_size);
     if ((read->buff_array_size == 2  || (read->buff_array_size == 1 && read->is_anonimous == 1)) &&
         strcmp("PASS", read->buff_array[0]) == 0) {
         if (read->is_autentificated == 0 || read->is_autentificated == 1)
@@ -47,7 +45,7 @@ void    password_authentification(int child_socket, read_t *read)
     }
 }
 
-void    cwd(int child_socket, read_t *read)
+void cwd(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 2 &&
         strcmp("CWD", read->buff_array[0]) == 0)
@@ -55,7 +53,7 @@ void    cwd(int child_socket, read_t *read)
             read->dir = read->buff_array[1];
 }
 
-void    cdup(int child_socket, read_t *read)
+void cdup(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 1 &&
         strcmp("CDUP", read->buff_array[0]) == 0)
@@ -63,7 +61,7 @@ void    cdup(int child_socket, read_t *read)
             read->dir = get_parent_dir(read->dir);    
 }
 
-void    quit(int child_socket, read_t *read)
+void quit(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 1 &&
         strcmp("QUIT", read->buff_array[0]) == 0) {
@@ -72,7 +70,7 @@ void    quit(int child_socket, read_t *read)
     }
 }
 
-void    delete(int child_socket, read_t *read)
+void delete(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 2 &&
         strcmp("DELETE", read->buff_array[0]) == 0) {
@@ -86,7 +84,7 @@ void    delete(int child_socket, read_t *read)
     }
 }
 
-void    pwd(int child_socket, read_t *read)
+void pwd(int child_socket, read_t *read)
 {
     char result[200];
 
@@ -104,63 +102,63 @@ void    pwd(int child_socket, read_t *read)
     } 
 }
 
-void    pasv(int child_socket, read_t *read)
+void pasv(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 1 &&
         strcmp("PASV", read->buff_array[0]) == 0)
         chose_and_send_code(child_socket, 227, read);
 }
 
-void    port(int child_socket, read_t *read)
+void port(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 2 &&
         strcmp("PORT", read->buff_array[0]) == 0)
         chose_and_send_code(child_socket, 200, read);
 }
 
-void    help(int child_socket, read_t *read)
+void help(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 1 &&
         strcmp("HELP", read->buff_array[0]) == 0)
         chose_and_send_code(child_socket, 214, read);
 }
 
-void    noop(int child_socket, read_t *read)
+void noop(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 1 &&
         strcmp("NOOP", read->buff_array[0]) == 0)
         chose_and_send_code(child_socket, 200, read);
 }
 
-void    retr(int child_socket, read_t *read)
+void retr(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 2 &&
         strcmp("RETR", read->buff_array[0]) == 0)
         chose_and_send_code(child_socket, 150, read);
 }
 
-void    stor(int child_socket, read_t *read)
+void stor(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 2 &&
         strcmp("STOR", read->buff_array[0]) == 0)
         chose_and_send_code(child_socket, 150, read);
 }
 
-void    list(int child_socket, read_t *read)
+void list(int child_socket, read_t *read)
 {
     if (read->buff_array_size == 2 &&
         strcmp("LIST", read->buff_array[0]) == 0)
         chose_and_send_code(child_socket, 150, read);
 }
 
-void    syntax_error(int child_socket, read_t *read)
+void syntax_error(int child_socket, read_t *read)
 {
     if (read->buff_array == NULL || strcmp("", read->buff_array[0]) == 0 ||
         read->any_instruction_sent == 0)
         send_specific_code(child_socket, 500);
 }
 
-void    set_options(list_t *my_var)
+void set_options(list_t *my_var)
 {
     my_var->options[0] = &user_authentification;
     my_var->options[1] = &password_authentification;
@@ -180,8 +178,9 @@ void    set_options(list_t *my_var)
     my_var->options[14] = NULL;
 }
 
-int    try_options(int child_socket, read_t  *read,
- void (*options[LEN_OPTIONS])(int child_socket, read_t *read))
+int try_options(int child_socket, read_t  *read,
+                void (*options[LEN_OPTIONS])(int child_socket,
+                                             read_t *read))
 {
     if (read == NULL)
         return (-1);

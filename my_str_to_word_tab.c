@@ -11,7 +11,7 @@ int count_space(char *str, char x)
 {
     int	a = 0;
     int	b = 0;
-    
+
     while (str[a]) {
         while (str[a] == x)
             a++;
@@ -22,13 +22,13 @@ int count_space(char *str, char x)
     return (b);
 }
 
-char    **my_str_to_wordtab(char *str, char x)
+char **my_str_to_wordtab(char *str, char x)
 {
     int	a = 0;
     int	b;
     int c = 0;
     char    **tab;
-    
+
     tab = malloc(sizeof(char *) * (count_space(str, x) + 1));
     while (str[c]) {
         b = 0;
@@ -47,7 +47,7 @@ char    **my_str_to_wordtab(char *str, char x)
 int len_array(char **av)
 {
     int result = 0;
-    
+
     for (result = 0; av != NULL && av[result] != NULL; result++);
     if (result <= 0)
         return 0;

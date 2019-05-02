@@ -11,7 +11,7 @@ list_t *my_var;
 
 int select_encap(fd_set *read_fd_set)
 {
-    return (select (FD_SETSIZE, read_fd_set, NULL, NULL, NULL));
+    return(select(FD_SETSIZE, read_fd_set, NULL, NULL, NULL));
 }
 
 int loop(list_t *my_var)
@@ -22,13 +22,12 @@ int loop(list_t *my_var)
         FD_SET (my_var->sock, &(my_var->read_fd_set));
         select_encap(&(my_var->read_fd_set));
         for (int i = 0; i < FD_SETSIZE; ++i)
-            if (FD_ISSET (i, &(my_var->read_fd_set))) {
+            if (FD_ISSET(i, &(my_var->read_fd_set)))
                 accept_client(i, my_var);
-            }
     } 
     printf("outside_loop\n");
     close(my_var->sock);
-    return 0;	
+    return (0);
 }
 
 int print_help(void)
@@ -39,7 +38,7 @@ int print_help(void)
     return (0);
 }
 
-void    close_socket(int sock)
+void close_socket(int sock)
 {
     if (my_var != NULL) {
         close(my_var->sock);
@@ -50,7 +49,7 @@ void    close_socket(int sock)
     exit(0);
 }
 
-int	my_ftp(int ac, char **av)
+int my_ftp(int ac, char **av)
 {
     my_var = malloc(sizeof(list_t));
     signal(SIGINT, close_socket);
@@ -63,7 +62,7 @@ int	my_ftp(int ac, char **av)
         set_options(my_var);
         return (loop(my_var));
     }
-    return 84;
+    return (84);
 }
 
 int main(int ac, char **av)

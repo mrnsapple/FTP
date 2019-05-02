@@ -7,10 +7,10 @@
 
 #include "list.h"
 
-const int   reply_codes_num[] = {120, 125, 150, 200, 214, 220, 221, 226, 227,
+const int reply_codes_num[] = {120, 125, 150, 200, 214, 220, 221, 226, 227,
                           230, 250, 257, 331, 332, 530, 550, 500, 444, -1};
 
-const char  *reply_codes[] = { 
+const char *reply_codes[] = { 
     "120 Service ready in nnn minutes.\n",
     "125 Data connection already open; transfer starting.\n",
     "150 File status okay; about to open data connection.\n",
@@ -32,7 +32,7 @@ const char  *reply_codes[] = {
     NULL
 };
 
-void    set_socket(list_t *my_var)
+void set_socket(list_t *my_var)
 {
     if ((my_var->sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
         perror("setsockopt"); 
@@ -47,7 +47,7 @@ void    set_socket(list_t *my_var)
         perror("setsockopt_listen"); 
 }
 
-void    send_specific_code(int current_socket, int   specific_code)
+void send_specific_code(int current_socket, int specific_code)
 {
     for (int i = 0; reply_codes_num[i] != -1 ; i++)
         if (reply_codes_num[i] == specific_code)
@@ -55,7 +55,8 @@ void    send_specific_code(int current_socket, int   specific_code)
 }
 
 int child_loop(int  child_socket,
-               void  (*options[LEN_OPTIONS])(int child_socket, read_t  *read), char *dir)
+               void  (*options[LEN_OPTIONS])(int child_socket, read_t  *read),
+               char *dir)
 {
     read_t  *read;
 
@@ -63,20 +64,19 @@ int child_loop(int  child_socket,
     read->dir = dir;
     read->is_autentificated = 0;
     read->is_anonimous = 0;
-
     send_specific_code(child_socket, 220);
     while (1)
         interact_with_client(child_socket, options, read);
     return (0);
 }
 
-int accept_client(int   i, list_t *my_var)
+int accept_client(int i, list_t *my_var)
 {
     pid_t pid;
     int child_socket;
     int ads;
     struct sockaddr_in adr;
-    
+
     if (my_var != NULL && i == my_var->sock) {
         child_socket = accept(my_var->sock, (struct sockaddr*)&(adr),
                                    (socklen_t*)(&(ads)));
@@ -94,7 +94,8 @@ int accept_client(int   i, list_t *my_var)
 }
 
 int interact_with_client(int child_socket,
-                         void (*options[LEN_OPTIONS])(int child_socket, read_t  *read), read_t *read)
+                         void (*options[LEN_OPTIONS])(int child_socket, read_t  *read),
+                         read_t *read)
 {   
     read = read_stuff(child_socket, read);
     if (read != NULL)

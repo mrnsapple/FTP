@@ -7,7 +7,7 @@
 
 #include "list.h"
 
-char   **delete_spaces(char **av)
+char **delete_spaces(char **av)
 {
     if (av == NULL)
         return (NULL);
@@ -18,7 +18,7 @@ char   **delete_spaces(char **av)
     return (av);
 }
 
-read_t  *read_stuff(int child_socket, read_t *reader)
+read_t *read_stuff(int child_socket, read_t *reader)
 {
     int result;
     char *av;
